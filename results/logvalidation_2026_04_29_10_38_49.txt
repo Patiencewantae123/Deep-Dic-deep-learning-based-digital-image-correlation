@@ -1,0 +1,2 @@
+kernel_size of conv_f is 2
+2026_04_29_10_38_49 Epoch:    loss:
