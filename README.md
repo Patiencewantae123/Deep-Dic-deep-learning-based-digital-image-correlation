@@ -21,12 +21,16 @@ publisher={Elsevier}<br/>
 ## Dependencies
 Deep-DIC is implemented in [PyTorch](https://pytorch.org/) and tested with Ubuntu 20.04, please install PyTorch first following the official instruction. 
 - Python 3.7 
-- PyTorch (version = 1.16)
+- PyTorch (version = 1.6.0, as in the paper)
 - Torchvision (version = 0.7.0)
 - Pillow (version = 7.2)
 - numpy
 - scipy
-- CUDA
+- opencv-python
+- CUDA (optional: the notebooks use the GPU when there is one and the CPU otherwise)
+
+The notebooks have also been tested with the newer versions pinned in `requirements.txt` (PyTorch 2.15 on a CPU):
+`pip install -r requirements.txt`.
 
 ## Overview
 We provide:
@@ -37,3 +41,33 @@ We provide:
     - StrainNet
 - Code to test with pair of speckle images.
 - Code to train the two CNNs with dataset.
+
+## Running the notebooks
+Run each notebook from the repository folder. The notebooks create every folder under `results/` themselves.
+
+### Measuring an image sequence
+1. Put the frames in `images/`. They are read in file-name order, so number them with leading zeros (`frame_001.png`, `frame_002.png`, ...).
+2. Put the pre-trained weights in `results/model/`, named `pretrained_displacementnet` and `pretrained_strainnet`.
+3. In `Diaplacement_run.ipynb`, set the starting ROI in the cell with the main loop: `x1, x2, y1, y2` are the top row, bottom row, left column and right column, in pixels. Set `x100, x200, y100, y200` to the same values.
+4. Run `Diaplacement_run.ipynb`, then `StrainNet_run.ipynb`. The ROI follows the material from frame to frame, and stretches with it.
+
+Each frame pair `i` (frames `i-1` and `i`) writes:
+
+| File | Key | Contents |
+|---|---|---|
+| `results/displacement/result_{i}_position1.mat` | `position` | ROI after this pair: top, bottom, left, right, then the height and width used for the pair |
+| | `roi_used` | ROI this pair was measured in |
+| `results/displacement/result_{i}_disp_0_x.mat` | `disp_1_x` | u and v for this pair, in image pixels, on the ROI resized to multiples of 32 |
+| | `disp_acc` | u and v accumulated from the first frame, on the starting ROI's grid |
+| `results/strain/{i}strain.mat` | `strain` | StrainNet's 4 raw channels at half size: du/d(row), du/d(column), dv/d(row), dv/d(column) |
+| | `strain_xx_yy_xy` | εxx, εyy and εxy for this pair, at the ROI's size |
+| | `strain_acc` | εxx, εyy and εxy accumulated from the first frame, on the starting ROI's grid |
+
+Strain is a fraction (0.01 = 1%). On the starting ROI's grid, each pixel is the same material point in every frame.
+
+### Training
+1. Put the dataset in `imgs3/` (`train_image_{n}_1.png`, `train_image_{n}_2.png`) and `gt3/` (`train_image_{n}.mat`), next to `train_dataset.txt` and `validation_dataset.txt`.
+2. Run `DisplacementNet_train.ipynb` or `StrainNet_train.ipynb`. Both train for 200 epochs, with the learning rate dropping from 1e-3 to 1e-5 after epoch 100, as in the paper.
+3. Checkpoints go to `results/model/` and logs to `results/log/`.
+
+A full run takes days on a CPU, so use a GPU. `analysis_results/` holds the audit of this code and its test results.

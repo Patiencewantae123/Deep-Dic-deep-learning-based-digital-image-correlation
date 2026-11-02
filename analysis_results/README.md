@@ -12,7 +12,7 @@ about 30 minutes per network. The fixed notebooks have not yet been run on the a
 | Measure | Result |
 |---|---|
 | Notebooks that run start to finish | 0 of 4 before, 4 of 4 after |
-| Behaviour checks on the fixed notebooks | 30 of 30 pass |
+| Behaviour checks on the fixed notebooks | 36 of 36 pass |
 | DisplacementNet mean error, 300 unseen pairs | 0.48 px (predicting zero: 1.67 px) |
 | Farneback optical flow, same pairs | 0.06 px |
 | StrainNet mean error, same pairs | 1.97% (predicting zero: 1.99%), so it did not learn |
@@ -42,6 +42,55 @@ DisplacementNet:
 
 The optical-flow row shows the test itself is sound. The fixed notebook's remaining 16 px comes from the
 briefly trained network, which overestimates the vertical increments by about 20%.
+
+## Accumulated fields and strain components
+
+The paper (Figure 2) adds up each frame's increment into accumulated displacement and strain fields,
+and reports strain as εxx, εyy and εxy. The run notebooks saved only each frame's increment, and
+StrainNet_run saved its four raw gradient channels at half the ROI size. Both now also save:
+
+| File | New key | Contents |
+|---|---|---|
+| `results/displacement/result_{i}_position1.mat` | `roi_used` | the ROI that frame pair i was measured in (`position` is the updated one) |
+| `results/displacement/result_{i}_disp_0_x.mat` | `disp_acc` | accumulated u and v in pixels, on the starting ROI's grid |
+| `results/strain/{i}strain.mat` | `strain_xx_yy_xy` | εxx, εyy, εxy for this frame pair, at the ROI's size |
+| `results/strain/{i}strain.mat` | `strain_acc` | accumulated εxx, εyy, εxy, on the starting ROI's grid |
+
+The existing keys are unchanged. On the starting ROI's grid, pixel (r, c) is the same material point in
+every frame, because the ROI follows the material. Strain is a fraction, as before.
+StrainNet_run now crops with `roi_used`, the same ROI DisplacementNet used for that pair. Before, it used
+the ROI one frame ahead.
+
+The components come from the four gradient channels: εxx = ∂u/∂column, εyy = ∂v/∂row, and εxy = ½(∂u/∂row +
+∂v/∂column). They are corrected for the ROI being resized to multiples of 32. Rigid rotation cancels
+in εxy, as the paper requires.
+
+`code/pipeline_test.py` runs both notebooks on the 40-frame tensile test, with optical flow standing in for the
+networks, to check this bookkeeping against the known answer:
+
+| Quantity after 40 frames | Notebooks | Truth |
+|---|---|---|
+| Accumulated displacement, mean error | u 0.21 px, v 0.31 px | v ranges from −82 to −23 px |
+| Accumulated εyy | 14.99% | 14.87% |
+| Accumulated εxx | −4.75% | −4.92% |
+| Accumulated εxy | 0.01% | 0 |
+
+## Differences from the paper left as they are
+
+| Paper | Code | Why it stays |
+|---|---|---|
+| LeakyReLU (Section 2.1) | ReLU | The authors' released weights are for the code's network. Changing it would stop them loading. |
+| Concatenated skip connections (Figure 3) | Added skip connections | Same reason |
+| StrainNet outputs εxx, εyy, εxy at full size | 4 gradients at half size | Same reason; StrainNet_run now converts them to the paper's components |
+| Loss × 10 (displacement) and × 100 (strain) | Plain MSE | A constant factor on the loss leaves Adam's steps unchanged (apart from its 1e-8 ε), and the strain labels are already in % |
+
+## Repository cleanup
+
+- `results/`: deleted the ten header-only `loglog_*` and `logvalidation_*` files from 29 April. The
+  old path-separator bug wrote them there; the notebooks now log to `results/log/`.
+- `DisplacementNet_train.ipynb`, `StrainNet_train.ipynb`: cleared the saved output and execution counts. They came from an
+  older run on another computer (`c:\Users\HomePC\...`) and did not match the code.
+- `README.md`: corrected "PyTorch 1.16" to the paper's 1.6.0, and added how to run the notebooks and what each output file holds.
 
 ## Longer training (in progress)
 
@@ -75,6 +124,7 @@ limit. StrainNet's weights are not included, because that run did not learn.
 | `06_strain_median_sample.png` | True strain, StrainNet and differentiated displacement |
 | `07_strain_overfit_test.png` | StrainNet loss on 12 fixed images |
 | `08_roi_tracking.png` | ROI position and edge error over 40 frames, committed against fixed notebook |
+| `09_long_training.png` | Validation error over both training runs, against the paper's final value |
 
 ## Reproducing the results
 

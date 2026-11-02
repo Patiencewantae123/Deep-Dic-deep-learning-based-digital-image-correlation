@@ -4,7 +4,7 @@ The only harness change: lists are cut right after the split cell and EPOCH is l
 Works in a temp folder, so nothing lands in the repo.
 """
 import glob, json, os, shutil, sys, tempfile, warnings
-import numpy as np, scipy.io as sio, torch
+import cv2, numpy as np, scipy.io as sio, torch
 
 REPO, HERE = sys.argv[1], os.path.dirname(os.path.abspath(__file__))
 DATA, PEEL = os.path.join(HERE, "data"), os.path.join(HERE, "peel_work")
@@ -108,6 +108,15 @@ check("saved u is rescaled by w0/wnew", np.allclose(d[0], pn[0] / 2 * w0 / wnew,
 check("saved v is rescaled by h0/hnew", np.allclose(d[1], pn[1] / 2 * h0 / hnew, rtol=1e-4), f"h0/hnew={h0}/{hnew}")
 check("field shape equals the resized ROI", d.shape == (2, hnew, wnew), d.shape)
 check("position is six integers", p.shape == (1, 6) and np.issubdtype(p.dtype, np.integer), p.tolist())
+p1 = sio.loadmat("results/displacement/result_1_position1.mat")
+p2 = sio.loadmat("results/displacement/result_2_position1.mat")
+check("roi_used of pair 2 is the ROI after pair 1", (p2["roi_used"][0] == p1["position"][0, :4]).all(), p2["roi_used"].tolist())
+inc = [sio.loadmat(f"results/displacement/result_{k}_disp_0_x.mat")["disp_1_x"] for k in (1, 2)]
+acc = sio.loadmat("results/displacement/result_2_disp_0_x.mat")["disp_acc"]
+h_ref, w_ref = ns["h_ref"], ns["w_ref"]
+check("accumulated displacement is on the starting ROI's grid", acc.shape == (2, h_ref, w_ref), acc.shape)
+expect = sum(np.stack([cv2.resize(c, (w_ref, h_ref)) for c in d_]) for d_ in inc)
+check("accumulated displacement is the sum of the resized increments", np.allclose(acc, expect, atol=1e-5))
 check("no deprecation warnings", not ns.get("_warnings"), ns.get("_warnings", [])[:2])
 
 print("\nStrainNet_run.ipynb")
@@ -119,6 +128,12 @@ files = sorted(os.listdir("results/strain"))
 check("one strain file per frame pair", len(files) == 2, files)
 s = sio.loadmat("results/strain/2strain.mat")["strain"]
 check("strain has 4 channels at half the ROI size", s.shape == (4, ns["hnew"] // 2, ns["wnew"] // 2), s.shape)
+m = sio.loadmat("results/strain/2strain.mat")
+sxy, h0, w0 = m["strain_xx_yy_xy"], ns["h0"], ns["w0"]
+check("exx, eyy, exy at the ROI's size", sxy.shape == (3, h0, w0), sxy.shape)
+check("exx is du/d(column) and eyy is dv/d(row)",
+      np.allclose(sxy[0], cv2.resize(s[1], (w0, h0)), atol=1e-6) and np.allclose(sxy[1], cv2.resize(s[2], (w0, h0)), atol=1e-6))
+check("accumulated strain is on the starting ROI's grid", m["strain_acc"].shape == (3, ns["h_ref"], ns["w_ref"]), m["strain_acc"].shape)
 check("no deprecation warnings", not ns.get("_warnings"), ns.get("_warnings", [])[:2])
 
 os.chdir(HERE)
