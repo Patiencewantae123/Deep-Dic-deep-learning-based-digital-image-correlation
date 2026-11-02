@@ -18,6 +18,36 @@ about 30 minutes per network. The fixed notebooks have not yet been run on the a
 | StrainNet mean error, same pairs | 1.97% (predicting zero: 1.99%), so it did not learn |
 | StrainNet on 12 images, overfitting test | loss 99.6% lower, so the pipeline can learn |
 | Error without `fcn.eval()` | 1.61 px against 0.47 px |
+| ROI tracking, 40-frame synthetic tensile test | committed notebook ends 134 px off the material, fixed notebook 16 px |
+
+## ROI tracking fix
+
+`Diaplacement_run.ipynb` moved the ROI by minus the measured displacement, and moved all four edges by
+the same mean value. The paper's data (Section 2.2) moves material at x to x + u, so the ROI has to move
+by +u. Its Figure 14 also shows the ROI stretching from 188 × 374 to 178 × 434 px, which a single
+mean shift cannot do. The fixed cell flips the sign and moves each edge by the displacement measured
+along that edge.
+
+`code/roi_test.py` checks this on 40 frames of a synthetic tensile test (16% vertical stretch, Poisson
+contraction, 16 px sideways drift), running cell 4 of each notebook version with the trained
+DisplacementNet:
+
+| Version | Worst edge error after 40 frames | Final ROI size (h × w) |
+|---|---|---|
+| Committed: minus sign, mean shift | 134 px, moving opposite to the material | 366 × 190 |
+| Sign flipped only | 40 px | 366 × 190 |
+| Fixed: plus sign, each edge follows its own displacement | 16 px | 434 × 185 |
+| Fixed, with optical flow in place of the network | 2 px | 421 × 182 |
+| Truth | | 425 × 181 |
+
+The optical-flow row shows the test itself is sound. The fixed notebook's remaining 16 px comes from the
+briefly trained network, which overestimates the vertical increments by about 20%.
+
+## Longer training (in progress)
+
+`code/train_long.py` continues both networks from the weights above for 120 minutes at learning rate
+1e-3 and 25 minutes at 1e-5, both networks at once on the CPU. Logs are written to `logs/long_run/` as
+it runs.
 
 ## Contents
 
@@ -44,6 +74,7 @@ limit. StrainNet's weights are not included, because that run did not learn.
 | `05_displacement_hard_sample.png` | The same for a difficult sample |
 | `06_strain_median_sample.png` | True strain, StrainNet and differentiated displacement |
 | `07_strain_overfit_test.png` | StrainNet loss on 12 fixed images |
+| `08_roi_tracking.png` | ROI position and edge error over 40 frames, committed against fixed notebook |
 
 ## Reproducing the results
 

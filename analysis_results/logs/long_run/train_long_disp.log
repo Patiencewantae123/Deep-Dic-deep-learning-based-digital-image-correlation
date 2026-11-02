@@ -1,2 +1,3 @@
 [disp] step 574 phase 1 8s val mse 1.7768 mae 0.9127
 [disp] step 600 phase 1 101s val mse 7.2824 mae 2.3591
+[disp] step 720 phase 1 586s val mse 2.8663 mae 1.2926
