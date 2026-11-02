@@ -1,0 +1,43 @@
+
+### DisplacementNet_train.ipynb
+ stage 0: cell-9 IndentationError: unexpected indent (cell-9, line 51)
+ stage 1: cell-9 RuntimeError: Given groups=1, weight of size [64, 2, 3, 3], expected input[12, 6, 128, 128] to have 2 channels, but got 6 channels instead
+ stage 2: PASS (31s)
+ artefacts: ['log', 'loglog_2026_11_02_11_24_39.txt', 'logvalidation_2026_11_02_11_24_39.txt', 'model', 'modelparam_all_2_9_0.pth']
+ results/model/ contents: []
+
+### StrainNet_train.ipynb
+ stage 0: cell-9 NameError: name 'log_result' is not defined
+ stage 1: cell-9 OSError: [Errno 22] Invalid argument: 'results\\log\\log2026_11_02_11:25:10'
+ stage 2: cell-9 NameError: name 'device' is not defined
+ stage 3: cell-9 NameError: name 'img' is not defined
+ stage 4: cell-9 FileNotFoundError: [Errno 2] No such file or directory: '/imgs3/train_image_8_1.png'
+ stage 5: cell-9 NameError: name 'interpolate' is not defined
+ stage 6: cell-9 NotImplementedError: `interp2d` has been removed in SciPy 1.14.0.
+ stage 7: PASS (31s)
+ stage 8: PASS (33s)
+ artefacts: ['log2026_11_02_11_25_44', 'validation2026_11_02_11_25_44'] ['param_all_strain2_9_0.pth']
+
+### Diaplacement_run.ipynb
+ stage 0: cell-3 AssertionError: Torch not compiled with CUDA enabled
+ stage 1: cell-3 NameError: name 'model_result' is not defined
+ stage 2: cell-4 NameError: name 'img_num' is not defined
+ stage 3: cell-4 NameError: name 'img_num' is not defined
+ stage 4: cell-4 FileNotFoundError: [Errno 2] No such file or directory: 'first_image'
+ stage 5: cell-4 RuntimeError: Cannot initialize CUDA without ATen_cuda library. PyTorch splits its backend into two shared libraries: a CPU library and a CUDA library; this error has occurred because you are trying to us
+ stage 6: cell-4 AssertionError: Torch not compiled with CUDA enabled
+ stage 7: cell-4 AttributeError: module 'numpy' has no attribute 'int'.
+ stage 8: PASS (2s)
+ artefacts: ['result_1_disp_0_x.mat', 'result_1_position1.mat', 'result_2_disp_0_x.mat', 'result_2_position1.mat']
+
+### StrainNet_run.ipynb
+ stage 0: cell-2 AssertionError: Torch not compiled with CUDA enabled
+ stage 1: cell-2 FileNotFoundError: [Errno 2] No such file or directory: 'PATH_TO_PRETRAINEDpretrained_strainnet'
+ stage 2: cell-3 NameError: name 'num_img' is not defined
+ stage 3: cell-3 FileNotFoundError: [Errno 2] No such file or directory: 'C:/Users/chosun/AppData/Local/Temp/claude/c--Users-chosun-Downloads-mty-my-New-folder-New-folder-Deep-Dic-deep-learning-based-digital-image-correlation/
+ stage 4: cell-3 FileNotFoundError: [Errno 2] No such file or directory: 'first_img'
+ stage 5: cell-3 NameError: name 'imgs' is not defined
+ stage 6: cell-3 RuntimeError: Cannot initialize CUDA without ATen_cuda library. PyTorch splits its backend into two shared libraries: a CPU library and a CUDA library; this error has occurred because you are trying to us
+ stage 7: cell-3 AssertionError: Torch not compiled with CUDA enabled
+ stage 8: PASS (1s)
+ artefacts: ['1strain.mat', '2strain.mat', 'result_1_disp_0_x.mat', 'result_1_position1.mat', 'result_2_disp_0_x.mat', 'result_2_position1.mat']

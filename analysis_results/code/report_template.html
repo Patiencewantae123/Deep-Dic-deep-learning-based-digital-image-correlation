@@ -1,0 +1,313 @@
+<title>Deep DIC Code Audit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a single measured reading column; figures break wider because a field map needs the room. */
+:root {
+  --bg: #f4f6f8; --surface: #fcfdfd; --ink: #111a22; --muted: #52606d; --line: #d9e0e6; --accent: #1c5cab;
+  --series: #2a78d6; --bar-quiet: #b4bfc9; --grid: #e1e5e9; --axis: #c0c9d1; --warn-bg: #fdf3e1; --warn-line: #e0a530;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1317; --surface: #161d23; --ink: #e8eef2; --muted: #a2afba; --line: #2b353e; --accent: #86b6ef;
+    --series: #3987e5; --bar-quiet: #4d5a66; --grid: #2a333b; --axis: #414e59; --warn-bg: #2c2312; --warn-line: #b98a24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1317; --surface: #161d23; --ink: #e8eef2; --muted: #a2afba; --line: #2b353e; --accent: #86b6ef;
+  --series: #3987e5; --bar-quiet: #4d5a66; --grid: #2a333b; --axis: #414e59; --warn-bg: #2c2312; --warn-line: #b98a24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--body); margin: 0; }
+.strip { height: 92px; background-size: 384px 384px; background-position: center 30%; background-repeat: repeat-x; image-rendering: pixelated; }
+main { max-width: 1040px; margin: 0 auto; padding-block: 28px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 52px; }
+main > * { min-width: 0; }
+.prose { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 6vw, 3.3rem); letter-spacing: -.01em; }
+h2 { font-size: 1.75rem; margin-bottom: 12px; }
+h3 { font-size: 1.2rem; margin: 26px 0 8px; }
+p { margin: 0 0 12px; }
+.lede { font-size: 1.16rem; line-height: 1.5; margin-top: 14px; max-width: 62ch; }
+.meta { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+code, .mono { font-family: var(--mono); font-size: .88em; overflow-wrap: anywhere; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 26px; border-top: 2px solid var(--ink); }
+.fact { padding: 14px 18px 4px 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fact + .fact { padding-left: 18px; border-left: 1px solid var(--line); }
+.fact b { font: 600 2.2rem/1.1 var(--display); }
+.fact span { color: var(--muted); font-size: .92rem; line-height: 1.4; }
+.note { background: var(--warn-bg); border: 1px solid var(--warn-line); padding: 14px 18px; border-radius: 4px; max-width: 76ch; }
+.note p:last-child { margin: 0; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .94rem; }
+th { text-align: left; font-weight: 600; color: var(--muted); font-size: .84rem; border-bottom: 1px solid var(--axis); padding: 6px 12px 6px 0; white-space: nowrap; }
+td { border-bottom: 1px solid var(--line); padding: 9px 12px 9px 0; vertical-align: top; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+details { border-top: 1px solid var(--line); padding: 10px 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; display: flex; justify-content: space-between; gap: 12px; font-weight: 500; }
+summary:focus-visible, .bar-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.count { color: var(--muted); font-weight: 400; white-space: nowrap; }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 36px; }
+.chart { min-width: 0; }
+.chart h3 { margin: 0 0 2px; font-size: 1.1rem; }
+.chart .sub { color: var(--muted); font-size: .88rem; margin: 0 0 10px; }
+.chart svg { display: block; width: 100%; }
+.chart svg text { font: 12px var(--body); fill: var(--muted); }
+.bars { display: grid; gap: 12px; }
+.bar-row { display: grid; gap: 3px; }
+.bar-label { font-size: .9rem; line-height: 1.3; }
+.bar-track { display: flex; align-items: center; gap: 8px; }
+.bar-track i { display: block; height: 18px; min-width: 2px; background: var(--bar-quiet); border-radius: 0 4px 4px 0; }
+.bar-row.hi i { background: var(--series); }
+.bar-track span { font-variant-numeric: tabular-nums; font-size: .9rem; font-weight: 500; white-space: nowrap; }
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--ink); color: var(--bg); font-size: .82rem; padding: 5px 9px; border-radius: 4px; max-width: 260px; line-height: 1.35; }
+.grid5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px 10px; }
+.tile { margin: 0; min-width: 0; }
+.tile img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.tile figcaption { font-size: .8rem; color: var(--muted); line-height: 1.25; margin-top: 4px; }
+.scales { display: flex; flex-wrap: wrap; gap: 14px 36px; margin-top: 14px; font-size: .82rem; }
+.scales > div { flex: 1 1 220px; max-width: 340px; min-width: 0; }
+.scales b { font-weight: 500; }
+.ramp { height: 10px; border-radius: 2px; margin-top: 3px; }
+.ticks { display: flex; justify-content: space-between; color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.todo { padding-left: 22px; margin: 0; display: grid; gap: 10px; max-width: 76ch; }
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; overflow-x: auto; font: 400 .84rem/1.55 var(--mono); margin: 0; }
+@media (max-width: 860px) {
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fact:nth-child(3) { padding-left: 0; border-left: 0; }
+  .charts { grid-template-columns: minmax(0, 1fr); }
+  .grid5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .grid5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<div class="strip" style="background-image:url({{SPECKLE}})" role="img" aria-label="A band of the synthetic speckle pattern used in the tests"></div>
+<main>
+<header>
+  <h1>Deep DIC Code Audit</h1>
+  <p class="lede">None of the four notebooks could run. They do now, and I trained both networks on synthetic data to see what the pipeline produces. DisplacementNet learned. StrainNet did not get past predicting zero in the time available.</p>
+  <p class="meta">Repository: Deep-Dic-deep-learning-based-digital-image-correlation, branch main, 2 November 2026. Measured on a 10-core Intel Core Ultra 5 225 with no GPU.</p>
+  <div class="facts">
+    <div class="fact"><b>4 of 4</b><span>notebooks now run start to finish. {{BLOCKERS}} blocking failures fixed; {{PASSED}} of {{TOTAL}} behaviour checks pass.</span></div>
+    <div class="fact"><b>{{D_NET}} px</b><span>DisplacementNet mean error on unseen images. Predicting zero scores {{D_ZERO}} px.</span></div>
+    <div class="fact"><b>{{S_NET}}%</b><span>StrainNet mean error, level with predicting zero at {{S_ZERO}}%.</span></div>
+    <div class="fact"><b>{{EVAL_X}}&times;</b><span>higher error from the missing <code>fcn.eval()</code>, the worst bug that gives no warning.</span></div>
+  </div>
+</header>
+
+<aside class="note">
+  <p><b>These numbers test the pipeline. They do not measure Deep DIC's accuracy.</b> The authors' dataset and weights are not in the repository, so I generated 3,600 image pairs from the paper's Tables 1 and 2. DisplacementNet then saw {{IMG_SEEN}} training images on a CPU, about {{RATIO}} times fewer than the 7.2 million in the paper's 200 epochs. The fixed notebooks have not yet been run on the authors' data.</p>
+</aside>
+
+<section>
+  <h2>What the code produces in each case</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Case</th><th>Result</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Committed code</td><td>Stops with an error in all four notebooks. No log has ever recorded a training step.</td><td>Measured</td></tr>
+      <tr><td>Fixed code, synthetic data, about 30 minutes per network</td><td>DisplacementNet {{D_NET}} px mean error. StrainNet {{S_NET}}%.</td><td>Measured</td></tr>
+      <tr><td>Fixed code, authors' data, this CPU</td><td>About {{DAYS_D}} days for DisplacementNet and {{DAYS_S}} days for StrainNet, from a measured {{STEP_S}} s per training step. Each network writes 20 checkpoints of 200 MB, about 4 GB.</td><td>Projected</td></tr>
+      <tr><td>Fixed code, authors' data, GPU</td><td>The paper reports validation errors of 0.024 px and 0.031% on average, and test errors of 0.038 px and 0.041%. Your results may differ, because the code differs from the paper in the ways listed below.</td><td>Paper's figures</td></tr>
+      <tr><td>Inference with trained weights</td><td>{{INFER}} ms per 128&times;128 image pair on this CPU. Each frame pair writes a displacement field, an ROI position and a strain file.</td><td>Measured</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>What stopped the notebooks</h2>
+  <p class="prose">Each failure hid the next one, so I fixed one at a time and reran until the notebook finished. The table for each notebook lists every failure in the order it appeared. The count of {{BLOCKERS}} includes placeholder names that needed real paths and GPU-only calls that fail on this CPU, so not every entry is a coding error.</p>
+  {{CHAINS}}
+</section>
+
+<section>
+  <h2>Bugs that give wrong numbers without crashing</h2>
+  <p class="prose">These are more dangerous than the crashes, because the code would have kept running. All are now fixed.</p>
+  <div class="charts">
+    <div class="chart"><h3>Inference without <code>fcn.eval()</code></h3><p class="sub">Mean displacement error on 150 unseen pairs, px</p><div id="c-eval" class="bars"></div></div>
+    <div class="chart"><h3>Light dims 20% between two frames</h3><p class="sub">Mean displacement error on 150 unseen pairs, px</p><div id="c-light" class="bars"></div></div>
+  </div>
+  <div class="scroll" style="margin-top:28px"><table>
+    <thead><tr><th>Bug</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Run notebooks never called <code>fcn.eval()</code></td><td>Error rose from {{EVAL_OK}} to {{EVAL_BAD}} px, almost as bad as no model. Each frame also overwrites the stored BatchNorm statistics, so the damage persists: {{EVAL_POL}} px even after switching to eval mode.</td></tr>
+      <tr><td>Validation images were also training images</td><td>All 4,000 validation images were in the training list, while the provided split files went unused. The two split files share no images. In this short run the leak made no measurable difference ({{TEST_R}}% of the zero-output error on unseen images, {{LEAK_R}}% on training images), because the network had not started to overfit. It would matter in a full run.</td></tr>
+      <tr><td>Fixed learning rate</td><td>The paper drops the rate 100&times;. Doing so cut validation MSE {{MSE_DROP}}%, from {{MSE_BEFORE}} to {{MSE_AFTER}}, in 4 minutes of training.</td></tr>
+      <tr><td>Saved displacement not rescaled</td><td>For the example ROI of {{H0}}&times;{{W0}}, resized to {{HNEW}}&times;{{WNEW}}, saved values were {{V_ERR}}% too large vertically and {{U_ERR}}% too large horizontally.</td></tr>
+      <tr><td><code>StrainNet_run</code> divided image 2 by image 1's maximum</td><td>Error doubled to {{LIGHT_BAD}} px when the light dimmed between frames. Dividing each image by its own maximum kept it at {{LIGHT_OK}} px.</td></tr>
+      <tr><td>Rebuilt file lists never reached the data loaders</td><td>The lists rebuilt inside the training cells had no effect, because the loaders were already built from the old paths.</td></tr>
+      <tr><td>Logs and checkpoints in the wrong folder</td><td>A missing path separator produced <code>results/loglog_*.txt</code> and <code>results/modelparam_*.pth</code>. Your <code>results/</code> folder still holds ten of those log files.</td></tr>
+      <tr><td>Unreadable labels replaced by zeros</td><td>The fallback created a zero array of the wrong size. It now reports the real file error.</td></tr>
+      <tr><td>ROI corners rounded two ways</td><td><code>np.int</code> truncated two corners and <code>round</code> rounded the other two, so the ROI size could change by a pixel per frame.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Training results</h2>
+  <div class="charts">
+    <div class="chart"><h3>DisplacementNet learned</h3><p class="sub">Mean error on 100 validation pairs, px at 128&times;128</p><div id="c-disp"></div></div>
+    <div class="chart"><h3>StrainNet stayed at its starting point</h3><p class="sub">Mean error on 100 validation pairs, % strain</p><div id="c-strain"></div></div>
+  </div>
+  <p class="prose" style="margin-top:16px">The spike at step 420 is real: validation error jumped to 5.1 px at the high learning rate and then recovered.</p>
+
+  <div class="charts" style="margin-top:24px">
+    <div class="chart"><h3>Displacement on 300 unseen pairs</h3><p class="sub">Mean absolute error, px at 128&times;128</p><div id="c-bdisp" class="bars"></div></div>
+    <div class="chart"><h3>Strain on 300 unseen pairs</h3><p class="sub">Mean absolute error, % strain</p><div id="c-bstrain" class="bars"></div></div>
+  </div>
+
+  <h3>Reading the displacement result</h3>
+  <p class="prose">DisplacementNet's mean error was {{D_NET}} px ({{D_U}} px horizontally, {{D_V}} px vertically), with a typical worst pixel of {{D_MAX}} px per image. Farneback optical flow, a classical method with no training, reached {{D_FLOW}} px, {{FLOW_RATIO}} times better. So this short run is far from competitive. My synthetic images also suit optical flow: they are clean, and the deformation is smooth and small.</p>
+
+  <h3>Median test sample</h3>
+  {{FIELDS_TYPICAL}}
+  <h3>A difficult test sample (95th percentile of error)</h3>
+  {{FIELDS_HARD}}
+
+  <h3>Why StrainNet did not learn</h3>
+  <p class="prose">A flat loss can mean a bug, so I checked three things separately.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Question</th><th>Result</th><th>Conclusion</th></tr></thead>
+    <tbody>
+      <tr><td>Are the strain labels right?</td><td>Strain differentiated from optical flow correlates with them at {{CORR_FLOW}} or higher on all four channels.</td><td>Labels and channel order are consistent</td></tr>
+      <tr><td>Did the trained network learn?</td><td>Its predictions correlate with the labels at {{CORR_PRED}} at best, and they vary far less (standard deviation {{PRED_STD}} against {{LABEL_STD}}).</td><td>Output is nearly constant</td></tr>
+      <tr><td>Can the pipeline learn at all?</td><td>On 12 fixed images, loss fell from {{OVER_START}} to {{OVER_END}}, or {{OVER_DROP}}% lower, in 240 steps.</td><td>The code path works</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="margin-top:14px">So the pipeline is sound and the {{STEPS_S}} training steps were too few. Strain needs the difference in displacement between nearby points, which is a harder signal to learn than overall motion. This rules out a broken pipeline, but it does not prove that full training will reach the paper's accuracy. Only a longer run can show that.</p>
+  <h3>Strain on the median sample</h3>
+  {{STRAIN_FIELDS}}
+  <p class="prose" style="margin-top:14px">Differentiating the network's displacement output gave {{S_DIFF}}% error, {{S_DIFF_X}} times worse than predicting zero, because differentiation amplifies pixel-level noise. The paper makes the same point in favour of predicting strain directly, but this run cannot confirm the benefit, because StrainNet itself did not learn.</p>
+</section>
+
+<section>
+  <h2>Where the code differs from the paper</h2>
+  <p class="prose">Only the training schedule was changed. Changing the network or its outputs would break the published pretrained weights, so those are left as committed.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Item</th><th>Paper</th><th>Code</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Training</td><td>200 epochs, rate 1e-3 then 1e-5 after 100</td><td>100 epochs, fixed rate</td><td>Changed to match the paper</td></tr>
+      <tr><td>Activation</td><td>LeakyReLU, slope 0.01</td><td>ReLU</td><td>Left as is</td></tr>
+      <tr><td>Skip connections</td><td>Concatenation</td><td>Addition</td><td>Left as is</td></tr>
+      <tr><td>StrainNet output</td><td>Three strains at full size</td><td>Four displacement gradients at half size</td><td>Left as is</td></tr>
+      <tr><td>Rotation in strain labels</td><td>Removed</td><td>Kept, as raw gradients include it</td><td>Left as is</td></tr>
+      <tr><td>Loss</td><td>MSE &times;10 for displacement, &times;100 for strain</td><td>Plain MSE, with strain labels &times;100</td><td>Left as is</td></tr>
+      <tr><td>Output fields</td><td>Accumulated over the sequence</td><td>Saved per frame pair</td><td>Left as is</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="margin-top:12px">The network has {{PARAMS}} million parameters and needs {{MACS}} billion multiply-accumulate operations per 128&times;128 pair. Inputs must be multiples of 32 pixels in both directions. {{UNUSED}} parameters in <code>conv1</code> and <code>fc</code> are never used, but they must stay for the pretrained weights to load.</p>
+</section>
+
+<section>
+  <h2>Still to check with the authors' data</h2>
+  <ol class="todo">
+    <li><b>ROI direction.</b> <code>Diaplacement_run</code> moves the ROI by minus the predicted displacement. The paper's description suggests plus. With a wrong sign, a sample moving 3 px per frame would leave the ROI {{ROI_WRONG}} px off after 10 frames. I could not read Eq. 1 from the PDF and left the code unchanged. To test it, shift an image by a known amount and check the sign of the output.</li>
+    <li><b>Strain channel order.</b> <code>np.gradient</code> returns the row derivative first, so the channel named <code>dudx</code> is really &part;u/&part;row if channel 0 is horizontal. A pure stretch u = 0.01x gives 0 in <code>dudx</code> and 0.01 in <code>dudy</code>. I kept the order for the pretrained weights and documented it in the notebooks, so read <code>strain[1]</code> and <code>strain[2]</code> as the normal strains until you have confirmed this.</li>
+    <li><b>Image format.</b> The loaders now convert images to 8-bit greyscale. That matches two-channel input, but I could not inspect the authors' files.</li>
+    <li><b>README.</b> It lists PyTorch 1.16, which does not exist. The paper says 1.6.0. I left the README unchanged. <code>requirements.txt</code> now lists the versions tested here.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Run it again</h2>
+  <p class="prose">Everything here regenerates from <code>analysis_results/code</code>. You need the packages in <code>requirements.txt</code>.</p>
+<pre>python gen_data.py 3600        # synthetic dataset, about 1 minute and 2.2 GB
+python train.py disp 25 4      # 25 minutes at the notebook rate, 4 at the low rate
+python train.py strain 25 4
+python evaluate.py             # test-set metrics and bug measurements
+python strain_diagnose.py      # the StrainNet checks</pre>
+</section>
+</main>
+<div id="tip" hidden></div>
+<script>
+const DATA = {{DATA}};
+const tip = document.getElementById('tip');
+function showTip(text, x, y) {
+  tip.textContent = text; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(Math.max(8, x + 12), innerWidth - r.width - 8) + 'px';
+  tip.style.top = Math.max(8, y - r.height - 10) + 'px';
+}
+function hideTip() { tip.hidden = true; }
+
+function bars(id, rows, unit, digits) {
+  const el = document.getElementById(id), max = Math.max(...rows.map(r => r.value));
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'bar-row' + (r.hi ? ' hi' : '');
+    row.tabIndex = 0;
+    const value = r.value.toFixed(digits) + ' ' + unit;
+    row.innerHTML = '<div class="bar-label"></div><div class="bar-track"><i></i><span></span></div>';
+    row.querySelector('.bar-label').textContent = r.label;
+    row.querySelector('i').style.flex = '0 0 calc((100% - 74px) * ' + (r.value / max) + ')';
+    row.querySelector('span').textContent = value;
+    const text = r.label + ': ' + value + '. ' + r.note;
+    row.setAttribute('aria-label', text);
+    row.addEventListener('pointermove', e => showTip(text, e.clientX, e.clientY));
+    row.addEventListener('pointerleave', hideTip);
+    row.addEventListener('focus', () => { const b = row.getBoundingClientRect(); showTip(text, b.left, b.top); });
+    row.addEventListener('blur', hideTip);
+    el.appendChild(row);
+  });
+}
+
+function niceStep(v) {
+  const raw = v / 4, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  return [1, 2, 2.5, 5, 10].find(s => s * p >= raw) * p;
+}
+
+function line(id, pts, drop, zero, unit) {
+  const el = document.getElementById(id), NS = 'http://www.w3.org/2000/svg';
+  function draw() {
+    el.textContent = '';
+    const W = Math.max(280, el.clientWidth), H = 240, m = { l: 34, r: 14, t: 12, b: 34 };
+    const top = Math.max(...pts.map(p => p.y)) * 1.04, step = niceStep(top);
+    const maxX = Math.max(...pts.map(p => p.x)), maxY = Math.ceil(top / step) * step;
+    const X = v => m.l + v / maxX * (W - m.l - m.r), Y = v => H - m.b - v / maxY * (H - m.t - m.b);
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('height', H);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Validation error from ' + pts[0].y + ' to ' + pts[pts.length - 1].y + ' ' + unit + ' over ' + maxX + ' steps');
+    const add = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; svg.appendChild(n); return n; };
+    for (let v = 0; v <= maxY + step / 2; v += step) {
+      add('line', { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: v ? 'var(--grid)' : 'var(--axis)', 'stroke-width': 1 });
+      add('text', { x: m.l - 6, y: Y(v) + 4, 'text-anchor': 'end' }, +v.toFixed(2));
+    }
+    for (let v = 0; v <= maxX; v += 100) add('text', { x: X(v), y: H - m.b + 16, 'text-anchor': 'middle' }, v);
+    add('text', { x: W - m.r, y: H - 4, 'text-anchor': 'end' }, 'Training step');
+    add('line', { x1: X(drop), x2: X(drop), y1: m.t, y2: H - m.b, stroke: 'var(--axis)', 'stroke-width': 1 });
+    add('text', { x: X(drop) - 5, y: m.t + 10, 'text-anchor': 'end' }, 'Rate 1e-3 to 1e-5');
+    add('line', { x1: m.l, x2: W - m.r, y1: Y(zero), y2: Y(zero), stroke: 'var(--muted)', 'stroke-width': 1 });
+    const flat = pts[pts.length - 1].y > zero * .8;  // a curve that stays on the reference line leaves room only below it
+    add('text', flat ? { x: m.l + 4, y: Y(zero) + 16 } : { x: W - m.r, y: Y(zero) - 5, 'text-anchor': 'end' }, 'Untrained: ' + zero.toFixed(2) + ' ' + unit);
+    add('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + X(p.x) + ' ' + Y(p.y)).join(''), fill: 'none', stroke: 'var(--series)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+    const end = pts[pts.length - 1];
+    add('circle', { cx: X(end.x), cy: Y(end.y), r: 4, fill: 'var(--series)', stroke: 'var(--surface)', 'stroke-width': 2 });
+    const cross = add('line', { y1: m.t, y2: H - m.b, stroke: 'var(--muted)', 'stroke-width': 1, visibility: 'hidden' });
+    const dot = add('circle', { r: 4, fill: 'var(--series)', stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden' });
+    const hit = add('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' });
+    hit.addEventListener('pointermove', e => {
+      const b = svg.getBoundingClientRect(), px = (e.clientX - b.left) * W / b.width;
+      const p = pts.reduce((a, c) => Math.abs(X(c.x) - px) < Math.abs(X(a.x) - px) ? c : a);
+      cross.setAttribute('x1', X(p.x)); cross.setAttribute('x2', X(p.x)); cross.setAttribute('visibility', 'visible');
+      dot.setAttribute('cx', X(p.x)); dot.setAttribute('cy', Y(p.y)); dot.setAttribute('visibility', 'visible');
+      showTip('Step ' + p.x + ': ' + p.y.toFixed(2) + ' ' + unit, e.clientX, e.clientY);
+    });
+    hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); hideTip(); });
+    el.appendChild(svg);
+  }
+  draw();
+  if (window.ResizeObserver) { let w = el.clientWidth; new ResizeObserver(() => { if (el.clientWidth !== w) { w = el.clientWidth; draw(); } }).observe(el); }
+}
+
+bars('c-eval', DATA.bars.eval, 'px', 2);
+bars('c-light', DATA.bars.light, 'px', 2);
+bars('c-bdisp', DATA.bars.disp, 'px', 2);
+bars('c-bstrain', DATA.bars.strain, '%', 2);
+line('c-disp', DATA.disp, DATA.dropD, DATA.zeroD, 'px');
+line('c-strain', DATA.strain, DATA.dropS, DATA.zeroS, '%');
+</script>

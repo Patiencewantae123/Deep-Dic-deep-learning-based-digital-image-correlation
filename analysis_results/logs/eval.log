@@ -1,0 +1,37 @@
+
+== held-out test (300 samples)
+  disp  zero         mean 1.6716 px  mean-max 4.613 px
+  disp  mean         mean 1.6749 px  mean-max 4.618 px
+  disp  farneback    mean 0.0628 px  mean-max 0.500 px
+  disp  net_p1       mean 0.8793 px  mean-max 4.064 px
+  disp  net_p2       mean 0.4756 px  mean-max 3.645 px
+  disp  net_u        mean 0.5189 px  mean-max 3.219 px
+  disp  net_v        mean 0.4323 px  mean-max 2.912 px
+  strain zero            mean 1.9918 %  mean-max 4.974 %
+  strain strainnet_p1    mean 2.0348 %  mean-max 5.754 %
+  strain strainnet_p2    mean 1.9718 %  mean-max 5.163 %
+  strain from_dispnet    mean 7.9478 %  mean-max 131.960 %
+  strain from_farneback  mean 0.8685 %  mean-max 8.982 %
+  per speckle type: {'large': 0.458, 'normal': 0.484, 'lowcontrast': 0.442, 'sparse': 0.501, 'noisy': 0.515}
+
+== training images used as validation (the notebook's leak) (300 samples)
+  disp  zero         mean 1.7218 px  mean-max 4.691 px
+  disp  mean         mean 1.7203 px  mean-max 4.690 px
+  disp  farneback    mean 0.0640 px  mean-max 0.512 px
+  disp  net_p1       mean 0.8973 px  mean-max 4.081 px
+  disp  net_p2       mean 0.5009 px  mean-max 3.692 px
+  disp  net_u        mean 0.5533 px  mean-max 3.254 px
+  disp  net_v        mean 0.4484 px  mean-max 2.908 px
+  strain zero            mean 2.0040 %  mean-max 5.151 %
+  strain strainnet_p1    mean 2.0286 %  mean-max 5.868 %
+  strain strainnet_p2    mean 1.9965 %  mean-max 5.370 %
+  strain from_dispnet    mean 8.1245 %  mean-max 135.097 %
+  strain from_farneback  mean 0.8907 %  mean-max 8.914 %
+  per speckle type: {'normal': 0.499, 'large': 0.531, 'noisy': 0.469, 'sparse': 0.397, 'lowcontrast': 0.511}
+
+== eval() bug: eval mode 0.4659 | train mode (as committed) 1.6105 | eval after 150 train-mode frames 1.3618
+== preprocessing: {'raw': 0.4659, 'norm_each': 0.4667, 'norm_first': 0.4662, 'dim_raw': 0.7281, 'dim_norm': 0.4667, 'dim_second_raw': 0.9567, 'dim_second_norm_each': 0.4667, 'dim_second_norm_first': 0.9413}
+== u = 0.01x:  the channel named dudx = 0.0   the channel named dudy = 0.010000000000000231
+== ROI rescale: {'h0': 366, 'w0': 190, 'hnew': 384, 'wnew': 192, 'v_err_pct': 4.918032786885251, 'u_err_pct': 1.0526315789473717}
+== ROI error after 10 frames: {'fixed_minus': -195.0, 'fixed_plus': 135.0, 'incremental_minus': -60.0, 'incremental_plus': 0.0}
+== picks {'typical': 3302, 'hard': 3359}

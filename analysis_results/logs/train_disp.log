@@ -1,0 +1,14 @@
+[disp] phase 1 start: val mse 16.4688 mae 3.1979
+[disp] step 60 ep 0 184s train 18.2441 val mse 16.9530 mae 3.2530
+[disp] step 120 ep 0 362s train 13.3401 val mse 23.8023 mae 4.0656
+[disp] step 180 ep 0 541s train 16.2615 val mse 15.3856 mae 3.1304
+[disp] step 240 ep 0 754s train 11.7627 val mse 13.2417 mae 2.7589
+[disp] step 300 ep 1 976s train 12.0760 val mse 12.6429 mae 2.5567
+[disp] step 360 ep 1 1137s train 8.3572 val mse 10.6292 mae 2.2715
+[disp] step 420 ep 1 1301s train 3.4625 val mse 199.2170 mae 10.2404
+[disp] step 480 ep 1 1466s train 2.4082 val mse 9.2380 mae 2.3842
+[disp] phase 1 end: step 493 val mse 4.9293 mae 1.7580
+[disp] phase 2 start: val mse 4.9293 mae 1.7580
+[disp] step 540 ep 0 1649s train 1.7168 val mse 1.8055 mae 0.8999
+[disp] phase 2 end: step 574 val mse 1.7768 mae 0.9127
+[disp] done, 0.062s data + 2.81s model per step

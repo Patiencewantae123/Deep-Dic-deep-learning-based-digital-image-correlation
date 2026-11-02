@@ -1,0 +1,397 @@
+{
+ "DisplacementNet_train": [
+  {
+   "stage": 0,
+   "fixes_so_far": [],
+   "cell": 9,
+   "error": "IndentationError",
+   "message": "unexpected indent (cell-9, line 51)",
+   "secs": 1.4
+  },
+  {
+   "stage": 1,
+   "fixes_so_far": [
+    "Rebuild cell-9 as one training loop"
+   ],
+   "cell": 9,
+   "error": "RuntimeError",
+   "message": "Given groups=1, weight of size [64, 2, 3, 3], expected input[12, 6, 128, 128] to have 2 channels, but got 6 channels instead",
+   "secs": 0.4
+  },
+  {
+   "stage": 2,
+   "fixes_so_far": [
+    "Rebuild cell-9 as one training loop",
+    "Load images as 1-channel: .convert('L')"
+   ],
+   "cell": null,
+   "error": null,
+   "message": null,
+   "secs": 31.4
+  }
+ ],
+ "StrainNet_train": [
+  {
+   "stage": 0,
+   "fixes_so_far": [],
+   "cell": 9,
+   "error": "NameError",
+   "message": "name 'log_result' is not defined",
+   "secs": 0.2
+  },
+  {
+   "stage": 1,
+   "fixes_so_far": [
+    "Define log_result / model_result"
+   ],
+   "cell": 9,
+   "error": "OSError",
+   "message": "[Errno 22] Invalid argument: 'results\\\\log\\\\log2026_11_02_11:25:10'",
+   "secs": 0.3
+  },
+  {
+   "stage": 2,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)"
+   ],
+   "cell": 9,
+   "error": "NameError",
+   "message": "name 'device' is not defined",
+   "secs": 0.2
+  },
+  {
+   "stage": 3,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device"
+   ],
+   "cell": 9,
+   "error": "NameError",
+   "message": "name 'img' is not defined",
+   "secs": 0.3
+  },
+  {
+   "stage": 4,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device",
+    "Restore the deleted `for step, (img, gt) in enumerate(train_loader):` line"
+   ],
+   "cell": 9,
+   "error": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: '/imgs3/train_image_8_1.png'",
+   "secs": 0.2
+  },
+  {
+   "stage": 5,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device",
+    "Restore the deleted `for step, (img, gt) in enumerate(train_loader):` line",
+    "Set dataset_path = '.' in cell-4 (cell-9's rebuild never reaches the loader)"
+   ],
+   "cell": 9,
+   "error": "NameError",
+   "message": "name 'interpolate' is not defined",
+   "secs": 0.2
+  },
+  {
+   "stage": 6,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device",
+    "Restore the deleted `for step, (img, gt) in enumerate(train_loader):` line",
+    "Set dataset_path = '.' in cell-4 (cell-9's rebuild never reaches the loader)",
+    "Import scipy.interpolate"
+   ],
+   "cell": 9,
+   "error": "NotImplementedError",
+   "message": "`interp2d` has been removed in SciPy 1.14.0.",
+   "secs": 1.0
+  },
+  {
+   "stage": 7,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device",
+    "Restore the deleted `for step, (img, gt) in enumerate(train_loader):` line",
+    "Set dataset_path = '.' in cell-4 (cell-9's rebuild never reaches the loader)",
+    "Import scipy.interpolate",
+    "Replace interp2d (removed from SciPy) with RectBivariateSpline"
+   ],
+   "cell": null,
+   "error": null,
+   "message": null,
+   "secs": 31.2
+  },
+  {
+   "stage": 8,
+   "fixes_so_far": [
+    "Define log_result / model_result",
+    "Remove ':' from the timestamp (invalid in Windows filenames)",
+    "Define device",
+    "Restore the deleted `for step, (img, gt) in enumerate(train_loader):` line",
+    "Set dataset_path = '.' in cell-4 (cell-9's rebuild never reaches the loader)",
+    "Import scipy.interpolate",
+    "Replace interp2d (removed from SciPy) with RectBivariateSpline",
+    "Cast validation gt to float and drop the extra dimension"
+   ],
+   "cell": null,
+   "error": null,
+   "message": null,
+   "secs": 33.2
+  }
+ ],
+ "Diaplacement_run": [
+  {
+   "stage": 0,
+   "fixes_so_far": [],
+   "cell": 3,
+   "error": "AssertionError",
+   "message": "Torch not compiled with CUDA enabled",
+   "secs": 0.3
+  },
+  {
+   "stage": 1,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)"
+   ],
+   "cell": 3,
+   "error": "NameError",
+   "message": "name 'model_result' is not defined",
+   "secs": 0.3
+  },
+  {
+   "stage": 2,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result"
+   ],
+   "cell": 4,
+   "error": "NameError",
+   "message": "name 'img_num' is not defined",
+   "secs": 0.8
+  },
+  {
+   "stage": 3,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device"
+   ],
+   "cell": 4,
+   "error": "NameError",
+   "message": "name 'img_num' is not defined",
+   "secs": 0.4
+  },
+  {
+   "stage": 4,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device",
+    "Define img_num and result paths"
+   ],
+   "cell": 4,
+   "error": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: 'first_image'",
+   "secs": 0.4
+  },
+  {
+   "stage": 5,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device",
+    "Define img_num and result paths",
+    "Replace placeholder image names with real paths"
+   ],
+   "cell": 4,
+   "error": "RuntimeError",
+   "message": "Cannot initialize CUDA without ATen_cuda library. PyTorch splits its backend into two shared libraries: a CPU library and a CUDA library; this error has occurred because you are trying to us",
+   "secs": 0.4
+  },
+  {
+   "stage": 6,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device",
+    "Define img_num and result paths",
+    "Replace placeholder image names with real paths",
+    "Remove torch.cuda.FloatTensor"
+   ],
+   "cell": 4,
+   "error": "AssertionError",
+   "message": "Torch not compiled with CUDA enabled",
+   "secs": 0.4
+  },
+  {
+   "stage": 7,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device",
+    "Define img_num and result paths",
+    "Replace placeholder image names with real paths",
+    "Remove torch.cuda.FloatTensor",
+    "Remove .cuda() on the input"
+   ],
+   "cell": 4,
+   "error": "AttributeError",
+   "message": "module 'numpy' has no attribute 'int'.",
+   "secs": 0.8
+  },
+  {
+   "stage": 8,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Define model_result",
+    "Load weights with the correct device",
+    "Define img_num and result paths",
+    "Replace placeholder image names with real paths",
+    "Remove torch.cuda.FloatTensor",
+    "Remove .cuda() on the input",
+    "Replace np.int (removed from NumPy) with int"
+   ],
+   "cell": null,
+   "error": null,
+   "message": null,
+   "secs": 1.6
+  }
+ ],
+ "StrainNet_run": [
+  {
+   "stage": 0,
+   "fixes_so_far": [],
+   "cell": 2,
+   "error": "AssertionError",
+   "message": "Torch not compiled with CUDA enabled",
+   "secs": 0.2
+  },
+  {
+   "stage": 1,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)"
+   ],
+   "cell": 2,
+   "error": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: 'PATH_TO_PRETRAINEDpretrained_strainnet'",
+   "secs": 0.2
+  },
+  {
+   "stage": 2,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file"
+   ],
+   "cell": 3,
+   "error": "NameError",
+   "message": "name 'num_img' is not defined",
+   "secs": 0.4
+  },
+  {
+   "stage": 3,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths"
+   ],
+   "cell": 3,
+   "error": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: 'C:/Users/chosun/AppData/Local/Temp/claude/c--Users-chosun-Downloads-mty-my-New-folder-New-folder-Deep-Dic-deep-learning-based-digital-image-correlation/",
+   "secs": 0.4
+  },
+  {
+   "stage": 4,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths",
+    "Read the file name Diaplacement_run actually writes"
+   ],
+   "cell": 3,
+   "error": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: 'first_img'",
+   "secs": 0.4
+  },
+  {
+   "stage": 5,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths",
+    "Read the file name Diaplacement_run actually writes",
+    "Replace placeholder image names with real paths"
+   ],
+   "cell": 3,
+   "error": "NameError",
+   "message": "name 'imgs' is not defined",
+   "secs": 0.4
+  },
+  {
+   "stage": 6,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths",
+    "Read the file name Diaplacement_run actually writes",
+    "Replace placeholder image names with real paths",
+    "Use one input variable (imgs2 is built but imgs is used)"
+   ],
+   "cell": 3,
+   "error": "RuntimeError",
+   "message": "Cannot initialize CUDA without ATen_cuda library. PyTorch splits its backend into two shared libraries: a CPU library and a CUDA library; this error has occurred because you are trying to us",
+   "secs": 0.4
+  },
+  {
+   "stage": 7,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths",
+    "Read the file name Diaplacement_run actually writes",
+    "Replace placeholder image names with real paths",
+    "Use one input variable (imgs2 is built but imgs is used)",
+    "Remove torch.cuda.FloatTensor"
+   ],
+   "cell": 3,
+   "error": "AssertionError",
+   "message": "Torch not compiled with CUDA enabled",
+   "secs": 0.4
+  },
+  {
+   "stage": 8,
+   "fixes_so_far": [
+    "Move the model to CPU (no GPU here)",
+    "Point at the weights file",
+    "Define num_img and paths",
+    "Read the file name Diaplacement_run actually writes",
+    "Replace placeholder image names with real paths",
+    "Use one input variable (imgs2 is built but imgs is used)",
+    "Remove torch.cuda.FloatTensor",
+    "Remove .cuda() on the input"
+   ],
+   "cell": null,
+   "error": null,
+   "message": null,
+   "secs": 1.0
+  }
+ ],
+ "_artefacts": {
+  "disp_results": [
+   "log",
+   "loglog_2026_11_02_11_24_39.txt",
+   "logvalidation_2026_11_02_11_24_39.txt",
+   "model",
+   "modelparam_all_2_9_0.pth"
+  ],
+  "disp_model": []
+ }
+}

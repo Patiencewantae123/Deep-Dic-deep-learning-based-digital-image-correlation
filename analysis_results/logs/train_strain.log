@@ -1,0 +1,14 @@
+[strain] phase 1 start: val mse 6.2060 mae 2.0316
+[strain] step 60 ep 0 210s train 4.9378 val mse 6.2077 mae 2.0331
+[strain] step 120 ep 0 386s train 5.5367 val mse 6.2046 mae 2.0336
+[strain] step 180 ep 0 560s train 9.1779 val mse 6.2061 mae 2.0315
+[strain] step 240 ep 0 731s train 5.3900 val mse 6.2103 mae 2.0315
+[strain] step 300 ep 1 903s train 5.7983 val mse 6.2015 mae 2.0292
+[strain] step 360 ep 1 1075s train 5.5435 val mse 6.1957 mae 2.0305
+[strain] step 420 ep 1 1248s train 5.7523 val mse 6.2097 mae 2.0322
+[strain] step 480 ep 1 1420s train 6.5484 val mse 6.3154 mae 2.0444
+[strain] phase 1 end: step 509 val mse 6.5039 mae 2.0685
+[strain] phase 2 start: val mse 6.5039 mae 2.0685
+[strain] step 540 ep 0 1612s train 6.7759 val mse 6.1266 mae 2.0182
+[strain] phase 2 end: step 591 val mse 6.1187 mae 2.0171
+[strain] done, 0.188s data + 2.59s model per step

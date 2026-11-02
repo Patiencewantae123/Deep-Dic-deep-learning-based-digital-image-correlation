@@ -1,0 +1,392 @@
+{
+ "DisplacementNet": {
+  "params": 49970472,
+  "unused": 522408,
+  "macs": 11872501760,
+  "shapes": [
+   [
+    "pretrained_net.conv_f",
+    [
+     1,
+     64,
+     128,
+     128
+    ]
+   ],
+   [
+    "pretrained_net.maxpool",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "pretrained_net.layer1",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "pretrained_net.layer2",
+    [
+     1,
+     128,
+     32,
+     32
+    ]
+   ],
+   [
+    "pretrained_net.layer3",
+    [
+     1,
+     256,
+     16,
+     16
+    ]
+   ],
+   [
+    "pretrained_net.layer4",
+    [
+     1,
+     512,
+     8,
+     8
+    ]
+   ],
+   [
+    "pretrained_net.conv_pre",
+    [
+     1,
+     1024,
+     4,
+     4
+    ]
+   ],
+   [
+    "conv3_2",
+    [
+     1,
+     512,
+     4,
+     4
+    ]
+   ],
+   [
+    "conv4",
+    [
+     1,
+     512,
+     8,
+     8
+    ]
+   ],
+   [
+    "conv5",
+    [
+     1,
+     256,
+     16,
+     16
+    ]
+   ],
+   [
+    "conv6",
+    [
+     1,
+     128,
+     32,
+     32
+    ]
+   ],
+   [
+    "conv7",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "conv8",
+    [
+     1,
+     64,
+     128,
+     128
+    ]
+   ],
+   [
+    "conv9",
+    [
+     1,
+     32,
+     256,
+     256
+    ]
+   ],
+   [
+    "convadd",
+    [
+     1,
+     16,
+     256,
+     256
+    ]
+   ],
+   [
+    "conv10",
+    [
+     1,
+     2,
+     128,
+     128
+    ]
+   ]
+  ],
+  "sizes": {
+   "128x128": [
+    128,
+    128
+   ],
+   "256x256": [
+    256,
+    256
+   ],
+   "160x96": [
+    160,
+    96
+   ],
+   "384x192": [
+    384,
+    192
+   ],
+   "64x64": [
+    64,
+    64
+   ],
+   "32x32": [
+    32,
+    32
+   ],
+   "100x100": "ERROR: The size of tensor a (16) must match the size of tensor b (13) at non-",
+   "128x130": "ERROR: The size of tensor a (20) must match the size of tensor b (17) at non-",
+   "96x128": [
+    96,
+    128
+   ]
+  },
+  "step1_nonzero": [
+   "conv10.weight"
+  ],
+  "grad_none": [
+   "pretrained_net.conv1.weight",
+   "pretrained_net.fc.weight",
+   "pretrained_net.fc.bias"
+  ],
+  "step_s": 2.5069660345713296,
+  "infer_s": 0.07882065773010254,
+  "epoch_h": 2.1767168707317777
+ },
+ "StrainNet": {
+  "params": 49970248,
+  "unused": 522408,
+  "macs": 11635261440,
+  "shapes": [
+   [
+    "pretrained_net.conv_f",
+    [
+     1,
+     64,
+     128,
+     128
+    ]
+   ],
+   [
+    "pretrained_net.maxpool",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "pretrained_net.layer1",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "pretrained_net.layer2",
+    [
+     1,
+     128,
+     32,
+     32
+    ]
+   ],
+   [
+    "pretrained_net.layer3",
+    [
+     1,
+     256,
+     16,
+     16
+    ]
+   ],
+   [
+    "pretrained_net.layer4",
+    [
+     1,
+     512,
+     8,
+     8
+    ]
+   ],
+   [
+    "pretrained_net.conv_pre",
+    [
+     1,
+     1024,
+     4,
+     4
+    ]
+   ],
+   [
+    "conv3_2",
+    [
+     1,
+     512,
+     4,
+     4
+    ]
+   ],
+   [
+    "conv4",
+    [
+     1,
+     512,
+     8,
+     8
+    ]
+   ],
+   [
+    "conv5",
+    [
+     1,
+     256,
+     16,
+     16
+    ]
+   ],
+   [
+    "conv6",
+    [
+     1,
+     128,
+     32,
+     32
+    ]
+   ],
+   [
+    "conv7",
+    [
+     1,
+     64,
+     64,
+     64
+    ]
+   ],
+   [
+    "conv8",
+    [
+     1,
+     64,
+     128,
+     128
+    ]
+   ],
+   [
+    "conv9",
+    [
+     1,
+     32,
+     128,
+     128
+    ]
+   ],
+   [
+    "convadd",
+    [
+     1,
+     16,
+     128,
+     128
+    ]
+   ],
+   [
+    "conv10",
+    [
+     1,
+     4,
+     64,
+     64
+    ]
+   ]
+  ],
+  "sizes": {
+   "128x128": [
+    64,
+    64
+   ],
+   "256x256": [
+    128,
+    128
+   ],
+   "160x96": [
+    80,
+    48
+   ],
+   "384x192": [
+    192,
+    96
+   ],
+   "64x64": [
+    32,
+    32
+   ],
+   "32x32": [
+    16,
+    16
+   ],
+   "100x100": "ERROR: The size of tensor a (16) must match the size of tensor b (13) at non-",
+   "128x130": "ERROR: The size of tensor a (20) must match the size of tensor b (17) at non-",
+   "96x128": [
+    48,
+    64
+   ]
+  },
+  "step1_nonzero": [
+   "conv10.weight"
+  ],
+  "grad_none": [
+   "pretrained_net.conv1.weight",
+   "pretrained_net.fc.weight",
+   "pretrained_net.fc.bias"
+  ],
+  "step_s": 2.2064557870229087,
+  "infer_s": 0.07680730819702149,
+  "epoch_h": 1.9240546094046698
+ },
+ "Displacement_train_run_match": true,
+ "Strain_train_run_match": true
+}

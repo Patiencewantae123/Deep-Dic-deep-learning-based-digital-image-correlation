@@ -1,0 +1,226 @@
+{
+ "DisplacementNet_train.ipynb": [
+  {
+   "cell": 0,
+   "status": "ok",
+   "error": "",
+   "secs": 2.21,
+   "warnings": []
+  },
+  {
+   "cell": 1,
+   "status": "ok",
+   "error": "",
+   "secs": 0.36,
+   "warnings": []
+  },
+  {
+   "cell": 2,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 3,
+   "status": "ok",
+   "error": "",
+   "secs": 0.26,
+   "warnings": [
+    "FutureWarning: `nn.init.constant` is now deprecated in favor of `nn.init.constant_`."
+   ]
+  },
+  {
+   "cell": 4,
+   "status": "ok",
+   "error": "",
+   "secs": 0.02,
+   "warnings": []
+  },
+  {
+   "cell": 5,
+   "status": "ok",
+   "error": "",
+   "secs": 0.22,
+   "warnings": []
+  },
+  {
+   "cell": 6,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 7,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 8,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 9,
+   "status": "SYNTAX",
+   "error": "IndentationError: unexpected indent (line 51)"
+  },
+  {
+   "cell": 10,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  }
+ ],
+ "StrainNet_train.ipynb": [
+  {
+   "cell": 0,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 1,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 2,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 3,
+   "status": "ok",
+   "error": "",
+   "secs": 0.26,
+   "warnings": [
+    "FutureWarning: `nn.init.constant` is now deprecated in favor of `nn.init.constant_`."
+   ]
+  },
+  {
+   "cell": 4,
+   "status": "ok",
+   "error": "",
+   "secs": 0.02,
+   "warnings": []
+  },
+  {
+   "cell": 5,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 6,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 7,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 8,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 9,
+   "status": "FAIL",
+   "error": "NameError: name 'log_result' is not defined [at <module>, line 2]",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 10,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  }
+ ],
+ "Diaplacement_run.ipynb": [
+  {
+   "cell": 0,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 2,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 3,
+   "status": "FAIL",
+   "error": "AssertionError: Torch not compiled with CUDA enabled [at _lazy_init, line 609]",
+   "secs": 0.26,
+   "warnings": [
+    "FutureWarning: `nn.init.constant` is now deprecated in favor of `nn.init.constant_`."
+   ]
+  },
+  {
+   "cell": 4,
+   "status": "FAIL",
+   "error": "NameError: name 'img_num' is not defined [at <module>, line 15]",
+   "secs": 0.0,
+   "warnings": []
+  }
+ ],
+ "StrainNet_run.ipynb": [
+  {
+   "cell": 0,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 1,
+   "status": "ok",
+   "error": "",
+   "secs": 0.0,
+   "warnings": []
+  },
+  {
+   "cell": 2,
+   "status": "FAIL",
+   "error": "AssertionError: Torch not compiled with CUDA enabled [at _lazy_init, line 609]",
+   "secs": 0.25,
+   "warnings": [
+    "FutureWarning: `nn.init.constant` is now deprecated in favor of `nn.init.constant_`."
+   ]
+  },
+  {
+   "cell": 3,
+   "status": "FAIL",
+   "error": "NameError: name 'num_img' is not defined [at <module>, line 5]",
+   "secs": 0.0,
+   "warnings": []
+  }
+ ]
+}

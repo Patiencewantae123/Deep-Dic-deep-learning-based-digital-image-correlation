@@ -1,0 +1,11 @@
+trained model vs label, correlation per channel: [0.114 0.159 0.044 0.018] | pred std 0.187, label std 2.530
+optical-flow strain vs label, correlation per channel: [0.859 0.891 0.882 0.867]
+overfit step 30 loss 3.7037 (76s)
+overfit step 60 loss 2.3430 (152s)
+overfit step 90 loss 1.3347 (227s)
+overfit step 120 loss 0.5464 (302s)
+overfit step 150 loss 0.2588 (378s)
+overfit step 180 loss 0.0724 (452s)
+overfit step 210 loss 0.0382 (521s)
+overfit step 240 loss 0.0240 (592s)
+overfit: 6.079 -> 0.025  (99.6% lower)

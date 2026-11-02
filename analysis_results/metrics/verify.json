@@ -1,0 +1,152 @@
+[
+ {
+  "check": "train and validation splits share no image",
+  "ok": true,
+  "detail": "368 train, 32 validation from 400 files on disk"
+ },
+ {
+  "check": "ran every cell",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "learning rate dropped 100x at the milestone",
+  "ok": true,
+  "detail": "1e-05"
+ },
+ {
+  "check": "checkpoint saved inside results/model/",
+  "ok": true,
+  "detail": "['param_all_2_9_0.pth']"
+ },
+ {
+  "check": "training log inside results/log/ with 10 rows",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "validation log has 10 epochs",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "nothing written beside results/log and results/model",
+  "ok": true,
+  "detail": "['log', 'model']"
+ },
+ {
+  "check": "output shape matches label",
+  "ok": true,
+  "detail": "(1, 2, 128, 128)"
+ },
+ {
+  "check": "no deprecation warnings",
+  "ok": true,
+  "detail": "[]"
+ },
+ {
+  "check": "train and validation splits share no image",
+  "ok": true,
+  "detail": "368 train, 32 validation from 400 files on disk"
+ },
+ {
+  "check": "ran every cell",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "learning rate dropped 100x at the milestone",
+  "ok": true,
+  "detail": "1e-05"
+ },
+ {
+  "check": "checkpoint saved inside results/model/",
+  "ok": true,
+  "detail": "['param_all_strain2_9_0.pth']"
+ },
+ {
+  "check": "training and validation logs written",
+  "ok": true,
+  "detail": "['log2026_11_02_12_46_18', 'validation2026_11_02_12_46_18']"
+ },
+ {
+  "check": "validation log has 10 epochs",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "labels reach the model as float32 at 64x64",
+  "ok": true,
+  "detail": "(1, 4, 64, 64)"
+ },
+ {
+  "check": "no deprecation warnings",
+  "ok": true,
+  "detail": "[]"
+ },
+ {
+  "check": "ran every cell",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "model is in eval mode",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "one position and one field per frame pair",
+  "ok": true,
+  "detail": "['result_1_disp_0_x.mat', 'result_1_position1.mat', 'result_2_disp_0_x.mat', 'result_2_position1.mat']"
+ },
+ {
+  "check": "saved u is rescaled by w0/wnew",
+  "ok": true,
+  "detail": "w0/wnew=190/192"
+ },
+ {
+  "check": "saved v is rescaled by h0/hnew",
+  "ok": true,
+  "detail": "h0/hnew=366/384"
+ },
+ {
+  "check": "field shape equals the resized ROI",
+  "ok": true,
+  "detail": "(2, 384, 192)"
+ },
+ {
+  "check": "position is six integers",
+  "ok": true,
+  "detail": "[[440, 806, 25, 215, 366, 190]]"
+ },
+ {
+  "check": "no deprecation warnings",
+  "ok": true,
+  "detail": "[]"
+ },
+ {
+  "check": "ran every cell",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "model is in eval mode",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "check": "one strain file per frame pair",
+  "ok": true,
+  "detail": "['1strain.mat', '2strain.mat']"
+ },
+ {
+  "check": "strain has 4 channels at half the ROI size",
+  "ok": true,
+  "detail": "(4, 192, 96)"
+ },
+ {
+  "check": "no deprecation warnings",
+  "ok": true,
+  "detail": "[]"
+ }
+]
