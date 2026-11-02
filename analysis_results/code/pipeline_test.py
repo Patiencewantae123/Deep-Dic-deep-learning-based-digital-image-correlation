@@ -15,7 +15,7 @@ from common import HERE, build_disp, build_strain
 import roi_test as T
 
 warnings.simplefilter("ignore")
-torch.set_num_threads(2)
+torch.set_num_threads(int(os.environ.get("THREADS", "2")))
 MODE, OUT_JSON = sys.argv[1], sys.argv[2]
 REPO = os.path.abspath(os.path.join(os.path.dirname(OUT_JSON), "..", ".."))
 WORK = os.path.join(HERE, "roi_work", f"pipeline_{MODE}")

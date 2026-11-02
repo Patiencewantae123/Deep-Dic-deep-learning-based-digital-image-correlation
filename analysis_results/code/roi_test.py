@@ -21,9 +21,6 @@ from torchvision.transforms import ToTensor
 from common import HERE, build_disp
 
 warnings.simplefilter("ignore")
-WEIGHTS, OUT_JSON, COMMITTED_NB = sys.argv[1:4]
-torch.set_num_threads(int(sys.argv[4]) if len(sys.argv) > 4 else 2)
-REPO = os.path.abspath(os.path.join(os.path.dirname(OUT_JSON), "..", ".."))
 WORK = os.path.join(HERE, "roi_work")
 FRAMES = os.path.join(WORK, "images")
 H, W = 1000, 300                       # frame size in pixels, the scale the network sees
@@ -85,7 +82,7 @@ def notebook_cell(name, nb, sign="as_written"):
             n = src.count(f"round({a}-d")
             assert n == 1, (a, n)
             src = src.replace(f"round({a}-d", f"round({a}+d")
-    ns = dict(np=np, torch=torch, os=os, ToTensor=ToTensor, fcn=fcn, device=torch.device("cpu"),
+    ns = dict(np=np, torch=torch, os=os, cv2=cv2, ToTensor=ToTensor, fcn=fcn, device=torch.device("cpu"),
               default_loader=lambda p: Image.open(p).convert("L"))
     exec(src, ns)
     rows = [list(ROI0)]
@@ -127,6 +124,9 @@ def corners(predict=predict):
 
 
 if __name__ == "__main__":
+    WEIGHTS, OUT_JSON, COMMITTED_NB = sys.argv[1:4]
+    torch.set_num_threads(int(sys.argv[4]) if len(sys.argv) > 4 else 2)
+    REPO = os.path.abspath(os.path.join(os.path.dirname(OUT_JSON), "..", ".."))
     if not os.path.exists(os.path.join(FRAMES, f"frame_{N_FRAMES:03d}.png")):
         make_frames()
     fcn = build_disp()

@@ -20,3 +20,8 @@
 [disp] step 2686 phase 1 7210s val mse 0.9238 mae 0.6909
 [disp] step 2686 phase 2 7218s val mse 0.9238 mae 0.6909
 [disp] step 2760 phase 2 7459s val mse 0.3389 mae 0.3891
+[disp] step 2880 phase 2 7850s val mse 0.3418 mae 0.3933
+[disp] step 3000 phase 2 8241s val mse 0.3022 mae 0.3756
+[disp] step 3120 phase 2 8632s val mse 0.2868 mae 0.3573
+[disp] step 3145 phase 2 8719s val mse 0.3035 mae 0.3664
+[disp] done: 2571 more steps, 3145 in total, 145 min

@@ -101,6 +101,56 @@ img_seen = T["disp"]["steps"] * 12
 ratio_paper = 36000 * 200 / img_seen
 fmt = lambda v, n=2: f"{v:.{n}f}"
 
+LE, PN, SPR = J("eval_long.json"), J("pipeline_test_net.json"), J("strain_probe.json")
+SC = LE["strain_const"]
+steps_long = {t: int(rows(f"long_{t}_val.csv")[-1]["step"]) for t in ("disp", "strain")}
+img_long = steps_long["disp"] * 12
+ROI_WEIGHTS_TEXT = {"disp_phase2.pth": f"trained for {T['disp']['steps']} steps",
+                    "long_disp_phase2.pth": f"the longer run, {steps_long['disp']:,} steps"}
+neg = lambda v, n=2: fmt(v, n).replace("-", "&minus;")
+CH_NAMES = ["&part;u/&part;row", "&part;u/&part;column (&epsilon;<sub>xx</sub>)", "&part;v/&part;row (&epsilon;<sub>yy</sub>)", "&part;v/&part;column"]
+ch_rows = "".join(f'<tr><td>{n}</td><td class="num">{fmt(c)}%</td><td class="num">{fmt(e)}%</td><td class="num">{neg(r)}</td></tr>'
+                  for n, c, e, r in zip(CH_NAMES, SC["best_constant_error_pct"], SC["net_error_pct"], SC["corr"]))
+PF = J("pipeline_test_flow.json")
+pm = SPR["mean_pct"]
+NB_CASE, C128, C192 = "notebook: ROI 366x190 -> 384x192", "128x128 crop, native scale", "192x192 crop, native scale"
+learned = max(range(4), key=lambda c: SC["corr"][c])
+LONG_HTML = f"""<section>
+  <h2>Longer training run: about 2.5 hours per network</h2>
+  <p class="prose">To see whether more training helps, I continued both networks from the first run's weights: 120 minutes at learning rate 1e-3, then 25 minutes at 1e-5, both at once on the CPU. DisplacementNet reached {steps_long['disp']:,} steps in total and StrainNet {steps_long['strain']:,}. That is {img_long:,} training images for DisplacementNet, about one epoch of the paper's 36,000 pairs.</p>
+  <figure class="wide"><img src="{img('09_long_training.png')}" alt="Validation error over both runs on a log scale. DisplacementNet falls to {fmt(float(rows('long_disp_val.csv')[-1]['val_mae']) * .5)} px; StrainNet to {fmt(float(rows('long_strain_val.csv')[-1]['val_mae']))}%. Both stay far above the paper's final values." width="1500" height="580"></figure>
+  <div class="scroll" style="margin-top:16px"><table>
+    <thead><tr><th>300 unseen pairs, mean error</th><th>Predicting zero</th><th>First run</th><th>Longer run</th><th>Paper's test set</th></tr></thead>
+    <tbody>
+      <tr><td>DisplacementNet</td><td class="num">{fmt(dp['zero']['mean'])} px</td><td class="num">{fmt(dp['net_p2']['mean'])} px</td><td class="num"><b>{fmt(LE['disp_px']['mean'])} px</b></td><td class="num">0.038 px</td></tr>
+      <tr><td>StrainNet</td><td class="num">{fmt(sp['zero']['mean'])}%</td><td class="num">{fmt(sp['strainnet_p2']['mean'])}%</td><td class="num"><b>{fmt(LE['strain_pct']['mean'])}%</b></td><td class="num">0.041%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="margin-top:14px">DisplacementNet's error is {fmt(dp['net_p2']['mean'] / LE['disp_px']['mean'], 1)} times lower than after the first run. Farneback optical flow still does better on these clean images ({fmt(dp['farneback']['mean'])} px), and the paper's error is {fmt(LE['disp_px']['mean'] / .038, 0)} times lower again.</p>
+
+  <h3>StrainNet learned one of its four channels</h3>
+  <p class="prose">To tell real learning from a network that has only learned the dataset's average, the table compares each channel with the best single value it could predict everywhere.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Channel, 300 unseen pairs</th><th>Best constant</th><th>StrainNet</th><th>Correlation with labels</th></tr></thead>
+    <tbody>{ch_rows}</tbody>
+  </table></div>
+  <p class="prose" style="margin-top:14px">On {CH_NAMES[learned]} StrainNet's predictions follow the labels, both between images and within each one. The other three channels are still level with the best constant. All of StrainNet's improvement comes from that one channel.</p>
+
+  <h3>Both trained networks on the 40-frame tensile test</h3>
+  <p class="prose">The ROI result above already uses the longer-trained DisplacementNet. Running both notebooks with the trained networks, on the same 40 frames, gives:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>After 40 frames</th><th>Trained networks</th><th>Optical flow in their place</th><th>Truth</th></tr></thead>
+    <tbody>
+      <tr><td>Accumulated displacement, mean error</td><td class="num">u {fmt(PN['disp_acc_mean_abs_error_px']['u'], 1)} px, v {fmt(PN['disp_acc_mean_abs_error_px']['v'], 1)} px</td><td class="num">u {fmt(PF['disp_acc_mean_abs_error_px']['u'])} px, v {fmt(PF['disp_acc_mean_abs_error_px']['v'])} px</td><td class="num">v from {neg(PF['disp_acc_range_true_px']['v'][0], 0)} to {neg(PF['disp_acc_range_true_px']['v'][1], 0)} px</td></tr>
+      <tr><td>Accumulated &epsilon;<sub>yy</sub></td><td class="num">{neg(PN['strain_acc_pct']['eyy'], 1)}%</td><td class="num">{neg(PF['strain_acc_pct']['eyy'], 1)}%</td><td class="num">{neg(PN['strain_acc_true_pct']['eyy'], 1)}%</td></tr>
+      <tr><td>Accumulated &epsilon;<sub>xx</sub></td><td class="num">{neg(PN['strain_acc_pct']['exx'], 1)}%</td><td class="num">{neg(PF['strain_acc_pct']['exx'], 1)}%</td><td class="num">{neg(PN['strain_acc_true_pct']['exx'], 1)}%</td></tr>
+      <tr><td>Accumulated &epsilon;<sub>xy</sub></td><td class="num">{neg(PN['strain_acc_pct']['exy'], 1)}%</td><td class="num">{neg(PF['strain_acc_pct']['exy'], 1)}%</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="margin-top:14px">The accumulated displacement is off by about {fmt(max(PN['disp_acc_mean_abs_error_px'].values()), 1)} px on average, out of up to {neg(-PF['disp_acc_range_true_px']['v'][0], 0)} px of motion. The accumulated strain is wrong. On one frame pair, StrainNet's &part;u/&part;column reads {neg(pm[NB_CASE][1])}% on the notebook's 384&times;192 ROI, where the truth is {neg(SPR['truth_pct'][1])}%, and 40 frames add that up. The same pair gives {neg(pm[C128][1])}% on a 128&times;128 crop and {neg(pm[C192][1])}% on 192&times;192. StrainNet has only seen 128&times;128 inputs and does not yet carry over to larger ones. DisplacementNet does, as its ROI result shows.</p>
+  <p class="prose">Each frame pair of a tensile test adds little strain, {neg(SPR['truth_pct'][2], 1)}% here. StrainNet's error has to be well below that, as the paper's 0.041% is, before its accumulated output means anything.</p>
+</section>"""
+
 bars_disp = [dict(label="Farneback optical flow (classical)", value=dp["farneback"]["mean"], note="OpenCV, no training"),
              dict(label="DisplacementNet with learning-rate drop", value=dp["net_p2"]["mean"], hi=True, note=f"{T['disp']['steps']} steps"),
              dict(label="DisplacementNet, notebook settings only", value=dp["net_p1"]["mean"], note="Learning rate fixed at 1e-3"),
@@ -115,6 +165,21 @@ bars_eval = [dict(label="Fixed: fcn.eval() called", value=ev["eval"], hi=True, n
 bars_light = [dict(label="Fixed: each image over its own maximum", value=pre["dim_second_norm_each"], hi=True, note="Now used by both run notebooks"),
               dict(label="Committed StrainNet_run: image 2 over image 1's maximum", value=pre["dim_second_norm_first"], note="Does not cancel the dimming"),
               dict(label="Training's preprocessing: no normalisation", value=pre["dim_second_raw"], note="Raw pixel values")]
+
+RT, PT = J("roi_test.json"), J("pipeline_test_flow.json")
+rs = RT["summary"]
+size = lambda r: f"{r['final_height']:.0f} &times; {r['final_width']:.0f}"
+roi_subs = dict(FIG_ROI=img("08_roi_tracking.png"), ROI_BEFORE=fmt(rs["before"]["worst_edge_error_px"], 0), ROI_SIGN=fmt(rs["sign_only"]["worst_edge_error_px"], 0),
+                ROI_FIXED_ERR=fmt(rs["fixed"]["worst_edge_error_px"], 0), ROI_FLOW=fmt(rs["fixed_flow"]["worst_edge_error_px"], 0),
+                ROI_BEFORE_SIZE=size(rs["before"]), ROI_SIGN_SIZE=size(rs["sign_only"]), ROI_FIXED_SIZE=size(rs["fixed"]),
+                ROI_FLOW_SIZE=size(rs["fixed_flow"]), ROI_TRUE_SIZE=size(rs["truth"]), ROI_WEIGHTS=ROI_WEIGHTS_TEXT.get(RT["weights"], RT["weights"]),
+                P_U=fmt(PT["disp_acc_mean_abs_error_px"]["u"]), P_V=fmt(PT["disp_acc_mean_abs_error_px"]["v"]),
+                P_VMIN=fmt(PT["disp_acc_range_true_px"]["v"][0], 0).replace("-", "&minus;"), P_VMAX=fmt(PT["disp_acc_range_true_px"]["v"][1], 0).replace("-", "&minus;"),
+                P_EYY=fmt(PT["strain_acc_pct"]["eyy"]), P_EYY_T=fmt(PT["strain_acc_true_pct"]["eyy"]),
+                P_EXX=fmt(PT["strain_acc_pct"]["exx"]).replace("-", "&minus;"), P_EXX_T=fmt(PT["strain_acc_true_pct"]["exx"]).replace("-", "&minus;"),
+                P_EXY=fmt(PT["strain_acc_pct"]["exy"]), LONG_SECTION=LONG_HTML,
+                L_D=fmt(LE["disp_px"]["mean"]), L_S=fmt(LE["strain_pct"]["mean"]), L_STEPS_S=f"{steps_long['strain']:,}",
+                L_IMG=f"{img_long:,}", L_RATIO=f"{36000 * 200 / img_long:,.0f}")
 
 DATA = json.dumps(dict(disp=disp_curve, strain=strain_curve, dropD=drop_d, dropS=drop_s, zeroD=disp_curve[0]["y"], zeroS=strain_curve[0]["y"],
                        bars=dict(disp=bars_disp, strain=bars_strain, eval=bars_eval, light=bars_light)))
@@ -138,7 +203,7 @@ subs = dict(
     STEP_S=fmt(M["DisplacementNet"]["step_s"]), INFER=fmt(M["DisplacementNet"]["infer_s"] * 1000, 0),
     DAYS_D=fmt(days_d, 0), DAYS_S=fmt(days_s, 0), STEPS_D=T["disp"]["steps"], STEPS_S=T["strain"]["steps"], IMG_SEEN=f"{img_seen:,}", RATIO=f"{ratio_paper:,.0f}",
     OVER_START=fmt(D["overfit_start"]), OVER_END=fmt(D["overfit_end"], 3), OVER_DROP=fmt(over_drop, 1), CORR_PRED=fmt(corr_pred), CORR_FLOW=fmt(corr_flow),
-    PRED_STD=fmt(D["pred_std"]), LABEL_STD=fmt(D["label_std"]),
+    PRED_STD=fmt(D["pred_std"]), LABEL_STD=fmt(D["label_std"]), **roi_subs,
 )
 page = TEMPLATE
 for k, v in subs.items():

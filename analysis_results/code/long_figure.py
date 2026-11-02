@@ -58,9 +58,9 @@ for ax, task, scale, unit, name in ((axes[0], "disp", .5, "px", "DisplacementNet
     ax.axhline(PAPER[task], color=INK, lw=1.2, ls=(0, (4, 3)))
     ax.text(max(x) * .01, PAPER[task] * 1.12, f"Paper after 200 epochs (~600,000 steps): {PAPER[task]} {unit}", va="bottom", fontsize=9)
     ax.plot(x, y, color=BLUE, lw=2, marker="o", ms=4.5, mec=SURFACE, mew=1.5)
-    near_top = np.log(y[-1] / lo) / np.log(hi / lo) > .75
-    ax.annotate(f"{y[-1]:.2f} {unit} at step {x[-1]:,}", (x[-1], y[-1]), xytext=(0, -18 if near_top else 10), textcoords="offset points",
-                ha="right", fontweight="bold")
+    # Below the end point: the curve before it is higher, so a label above would sit on the line
+    ax.annotate(f"{y[-1]:.2f} {unit} at step {x[-1]:,}", (x[-1], y[-1]), xytext=(0, -10), textcoords="offset points",
+                ha="right", va="top", fontweight="bold")
     ticks = [t for t in (.01, .02, .05, .1, .2, .5, 1, 2, 5, 10) if lo <= t <= hi]
     ax.set_yticks(ticks)
     ax.set_yticklabels([f"{t:g}" for t in ticks])

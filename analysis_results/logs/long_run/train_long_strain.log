@@ -17,3 +17,6 @@
 [strain] step 2270 phase 2 7226s val mse 4.7585 mae 1.6977
 [strain] step 2280 phase 2 7280s val mse 4.7681 mae 1.7027
 [strain] step 2400 phase 2 7764s val mse 4.6187 mae 1.6445
+[strain] step 2520 phase 2 8255s val mse 4.6028 mae 1.6389
+[strain] step 2637 phase 2 8724s val mse 4.6172 mae 1.6479
+[strain] done: 2046 more steps, 2637 in total, 145 min
