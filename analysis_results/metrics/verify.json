@@ -67,7 +67,7 @@
  {
   "check": "training and validation logs written",
   "ok": true,
-  "detail": "['log2026_11_02_19_42_32', 'validation2026_11_02_19_42_32']"
+  "detail": "['log2026_11_03_09_44_14', 'validation2026_11_03_09_44_14']"
  },
  {
   "check": "validation log has 10 epochs",
@@ -102,27 +102,27 @@
  {
   "check": "saved u is rescaled by w0/wnew",
   "ok": true,
-  "detail": "w0/wnew=188/192"
+  "detail": "w0/wnew=190/192"
  },
  {
   "check": "saved v is rescaled by h0/hnew",
   "ok": true,
-  "detail": "h0/hnew=370/384"
+  "detail": "h0/hnew=366/352"
  },
  {
   "check": "field shape equals the resized ROI",
   "ok": true,
-  "detail": "(2, 384, 192)"
+  "detail": "(2, 352, 192)"
  },
  {
   "check": "position is six integers",
   "ok": true,
-  "detail": "[[433, 805, 22, 210, 370, 188]]"
+  "detail": "[[440, 806, 25, 215, 366, 190]]"
  },
  {
   "check": "roi_used of pair 2 is the ROI after pair 1",
   "ok": true,
-  "detail": "[[436, 806, 24, 212]]"
+  "detail": "[[440, 806, 25, 215]]"
  },
  {
   "check": "accumulated displacement is on the starting ROI's grid",
@@ -157,12 +157,12 @@
  {
   "check": "strain has 4 channels at half the ROI size",
   "ok": true,
-  "detail": "(4, 192, 96)"
+  "detail": "(4, 176, 96)"
  },
  {
   "check": "exx, eyy, exy at the ROI's size",
   "ok": true,
-  "detail": "(3, 370, 188)"
+  "detail": "(3, 366, 190)"
  },
  {
   "check": "exx is du/d(column) and eyy is dv/d(row)",

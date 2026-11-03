@@ -190,8 +190,8 @@ pre { background: var(--surface); border: 1px solid var(--line); border-radius: 
   <p class="prose" style="margin-top:16px">The spike at step 420 is real: validation error jumped to 5.1 px at the high learning rate and then recovered.</p>
 
   <div class="charts" style="margin-top:24px">
-    <div class="chart"><h3>Displacement on 300 unseen pairs</h3><p class="sub">Mean absolute error, px at 128&times;128</p><div id="c-bdisp" class="bars"></div></div>
-    <div class="chart"><h3>Strain on 300 unseen pairs</h3><p class="sub">Mean absolute error, % strain</p><div id="c-bstrain" class="bars"></div></div>
+    <div class="chart"><h3>Displacement on {{N_TEST}} unseen pairs</h3><p class="sub">Mean absolute error, px at 128&times;128</p><div id="c-bdisp" class="bars"></div></div>
+    <div class="chart"><h3>Strain on {{N_TEST}} unseen pairs</h3><p class="sub">Mean absolute error, % strain</p><div id="c-bstrain" class="bars"></div></div>
   </div>
 
   <h3>Reading the displacement result</h3>
@@ -220,6 +220,8 @@ pre { background: var(--surface); border: 1px solid var(--line); border-radius: 
 
 {{LONG_SECTION}}
 
+{{PAPER_SECTION}}
+
 <section>
   <h2>Where the code differs from the paper</h2>
   <p class="prose">The network is left as committed, because changing it would stop the published pretrained weights from loading. The training schedule, ROI tracking and outputs now follow the paper.</p>
@@ -233,7 +235,8 @@ pre { background: var(--surface); border: 1px solid var(--line); border-radius: 
       <tr><td>Rotation in strain labels</td><td>Removed</td><td>Kept, as raw gradients include it</td><td>Labels left as is; the converted &epsilon;<sub>xy</sub> cancels it</td></tr>
       <tr><td>Loss</td><td>MSE &times;10 for displacement, &times;100 for strain</td><td>Plain MSE, with strain labels &times;100</td><td>Left as is: a constant loss factor does not change Adam's steps</td></tr>
       <tr><td>Output fields</td><td>Accumulated over the sequence</td><td>Saved per frame pair</td><td>Accumulated fields now saved as well</td></tr>
-      <tr><td>ROI update</td><td>Corners follow the accumulated displacement</td><td>Minus the mean displacement, size fixed</td><td>Changed to match the paper</td></tr>
+      <tr><td>ROI update</td><td>Corners follow the accumulated displacement</td><td>Minus the mean displacement, size fixed</td><td>Changed to match the paper. Each edge follows the mean displacement of a band 5% wide along it, which is steadier than single corner pixels</td></tr>
+      <tr><td>Resize before the network</td><td>Nearest multiple of 32</td><td>Always the next multiple up, adding 32 px even when the ROI already fits</td><td>Changed to match the paper</td></tr>
     </tbody>
   </table></div>
   <p class="prose" style="margin-top:12px">The network has {{PARAMS}} million parameters and needs {{MACS}} billion multiply-accumulate operations per 128&times;128 pair. Inputs must be multiples of 32 pixels in both directions. {{UNUSED}} parameters in <code>conv1</code> and <code>fc</code> are never used, but they must stay for the pretrained weights to load.</p>
@@ -244,6 +247,7 @@ pre { background: var(--surface); border: 1px solid var(--line); border-radius: 
   <ol class="todo">
     <li><b>Strain channel order.</b> <code>np.gradient</code> returns the row derivative first, so the channel named <code>dudx</code> is really &part;u/&part;row if channel 0 of the labels is the horizontal u. <code>StrainNet_run</code>'s new &epsilon;<sub>xx</sub>, &epsilon;<sub>yy</sub>, &epsilon;<sub>xy</sub> assume exactly that. If the authors' <code>.mat</code> files store the fields the other way round, swap &epsilon;<sub>xx</sub> and &epsilon;<sub>yy</sub>.</li>
     <li><b>StrainNet convergence.</b> After {{L_STEPS_S}} steps StrainNet has learned one of its four channels, and its output still depends on the input size. The paper's StrainNet error fell within its first few epochs (Figure 7), and one epoch of its 36,000 pairs is 3,000 steps at batch 12. Whether full training removes the size dependence needs a GPU run.</li>
+    <li><b>Dataset statistics.</b> Table 2 gives parameter ranges but not how they were sampled. Uniform sampling, as here, gives deformations 4&ndash;10 times larger than the paper's Figure A-1. The authors' dataset would show which sampling they used.</li>
     <li><b>Image format.</b> The loaders now convert images to 8-bit greyscale. That matches two-channel input, but I could not inspect the authors' files.</li>
   </ol>
 </section>
@@ -259,13 +263,15 @@ python strain_diagnose.py      # the StrainNet checks
 python train_long.py disp 6 120 25 ../logs/long_run     # longer runs, both at once: 6 and 4 threads
 python train_long.py strain 4 120 25 ../logs/long_run
 python long_figure.py ../logs/long_run ../figures/09_long_training.png
-python eval_long.py ../metrics/eval_long.json
-python const_baseline.py ../metrics/eval_long.json      # StrainNet channel by channel
+python gen_data.py 3800 3601    # 200 more test pairs, so the test set is 3301-3800
+python eval_test500.py ../metrics/test500.json   # every model and baseline on the 500 test pairs
 python roi_test.py runs/long_disp_phase2.pth ../metrics/roi_test.json roi_before/Diaplacement_run.ipynb 10
 python roi_figure.py ../metrics/roi_test.json ../figures/08_roi_tracking.png
 python pipeline_test.py flow ../metrics/pipeline_test_flow.json
 python pipeline_test.py net ../metrics/pipeline_test_net.json runs/long_disp_phase2.pth runs/long_strain_phase2.pth
 python strain_probe.py ../metrics/strain_probe.json     # StrainNet against input size
+python dataset_stats.py ../metrics/dataset_stats.json   # training-set statistics, as in the paper's Appendix A
+python paper_checks.py ../metrics/paper_checks.json     # noise floor (Table 5) and rigid translation (Figure 12)
 python verify_fixed.py &lt;repo&gt;     # behaviour checks on the fixed notebooks</pre>
 </section>
 </main>

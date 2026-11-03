@@ -92,12 +92,18 @@ def make(i):
 
 
 if __name__ == "__main__":
+    # python gen_data.py <n> [first]: samples first..n (default 1..n). Each sample is seeded by its own number,
+    # so extending the dataset later leaves the existing samples unchanged.
     n = int(sys.argv[1])
+    first = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     os.makedirs(os.path.join(OUT, "imgs3"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "gt3"), exist_ok=True)
     with mp.Pool(8, initializer=cv2.setNumThreads, initargs=(1,)) as p:
-        rows = p.map(make, range(1, n + 1), chunksize=16)
-    json.dump(rows, open(os.path.join(OUT, "meta.json"), "w"))
+        rows = p.map(make, range(first, n + 1), chunksize=16)
+    meta = os.path.join(OUT, "meta.json")
+    if first > 1 and os.path.exists(meta):
+        rows = [r for r in json.load(open(meta)) if r[0] < first] + rows
+    json.dump(rows, open(meta, "w"))
     kinds = {k: sum(r[1] == k for r in rows) for k in {r[1] for r in rows}}
     print("samples", n, kinds)
     print("mean |disp| 256-grid px: %.2f, largest %.1f" % (np.mean([r[2] for r in rows]), np.max([r[3] for r in rows])))

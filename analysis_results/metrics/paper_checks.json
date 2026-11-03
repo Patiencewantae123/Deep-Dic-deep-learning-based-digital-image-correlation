@@ -1,0 +1,79 @@
+{
+ "weights": {
+  "disp": "long_disp_phase2.pth",
+  "strain": "long_strain_phase2.pth"
+ },
+ "paper": {
+  "noise_disp_px": [
+   0.0094,
+   0.0065
+  ],
+  "noise_strain_pct": [
+   0.0073,
+   0.0045
+  ],
+  "translation_max_diff_px": 0.275
+ },
+ "noise_floor": {
+  "pairs": 21,
+  "disp_net_px": {
+   "mean": 0.13098002970218658,
+   "std": 0.0056507703848183155
+  },
+  "disp_farneback_px": {
+   "mean": 0.01292116567492485,
+   "std": 0.0007970637525431812
+  },
+  "strain_net_pct": {
+   "mean": 0.3782930374145508,
+   "std": 0.08917754143476486
+  }
+ },
+ "translation": [
+  {
+   "shift_px": 0.25,
+   "net_mean_v": 0.2223193645477295,
+   "net_mean_abs_error": 0.15709736943244934,
+   "net_spread_v": 0.7607135772705078,
+   "flow_mean_v": 0.25824394822120667,
+   "flow_mean_abs_error": 0.017607111483812332,
+   "strain_net_mean_abs_pct": 0.2247331589460373
+  },
+  {
+   "shift_px": 0.5,
+   "net_mean_v": 0.46941670775413513,
+   "net_mean_abs_error": 0.16010846197605133,
+   "net_spread_v": 0.811303973197937,
+   "flow_mean_v": 0.5009063482284546,
+   "flow_mean_abs_error": 0.014631928876042366,
+   "strain_net_mean_abs_pct": 0.4633626937866211
+  },
+  {
+   "shift_px": 1.0,
+   "net_mean_v": 1.0120841264724731,
+   "net_mean_abs_error": 0.1564464122056961,
+   "net_spread_v": 0.8021608591079712,
+   "flow_mean_v": 0.9999003410339355,
+   "flow_mean_abs_error": 0.015106754377484322,
+   "strain_net_mean_abs_pct": 0.4993276596069336
+  },
+  {
+   "shift_px": 1.5,
+   "net_mean_v": 1.514359712600708,
+   "net_mean_abs_error": 0.18612852692604065,
+   "net_spread_v": 0.9420259594917297,
+   "flow_mean_v": 1.501468300819397,
+   "flow_mean_abs_error": 0.01580422930419445,
+   "strain_net_mean_abs_pct": 0.6165539622306824
+  },
+  {
+   "shift_px": 2.0,
+   "net_mean_v": 1.9418554306030273,
+   "net_mean_abs_error": 0.20597422122955322,
+   "net_spread_v": 1.1130402088165283,
+   "flow_mean_v": 2.000641345977783,
+   "flow_mean_abs_error": 0.01695636846125126,
+   "strain_net_mean_abs_pct": 0.5339018106460571
+  }
+ ]
+}

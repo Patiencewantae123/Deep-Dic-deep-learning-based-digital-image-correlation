@@ -28,12 +28,15 @@ def run(box, size, norm=True):
         return net(torch.cat(t, 0)[None].float())[0].numpy().mean(axis=(1, 2))
 
 
-cases = {"notebook: ROI 366x190 -> 384x192": ((y1, x1, y2, x2), (192, 384)),
-         "same, no max normalisation": ((y1, x1, y2, x2), (192, 384), False),
+near32 = lambda n: max(32, int(n / 32 + .5) * 32)          # the run notebooks' resize (paper, Section 2.1)
+HN, WN = near32(x2 - x1), near32(y2 - y1)
+NB = f"notebook: ROI {x2 - x1}x{y2 - y1} -> {HN}x{WN}"
+cases = {NB: ((y1, x1, y2, x2), (WN, HN)),
+         "same, no max normalisation": ((y1, x1, y2, x2), (WN, HN), False),
          "128x128 crop, native scale": ((y1, x1 + 100, y1 + 128, x1 + 228), (128, 128)),
          "192x192 crop, native scale": ((y1, x1 + 100, y1 + 192, x1 + 292), (192, 192)),
          "256x256 crop -> 128x128 (training's resize)": ((y1 - 25, x1 + 50, y1 + 231, x1 + 306), (128, 128))}
-res = dict(weights=os.path.basename(W), frames=[10, 11], channels=["du/drow", "du/dcol", "dv/drow", "dv/dcol"],
+res = dict(weights=os.path.basename(W), frames=[10, 11], notebook_case=NB, channels=["du/drow", "du/dcol", "dv/drow", "dv/dcol"],
            truth_pct=[0, -T.NU * T.D_EPS * 100, T.D_EPS * 100, 0], mean_pct={k: run(*c).tolist() for k, c in cases.items()})
 json.dump(res, open(sys.argv[1], "w"), indent=1)
 for k, v in res["mean_pct"].items():

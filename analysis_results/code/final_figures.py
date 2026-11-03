@@ -56,48 +56,37 @@ save(fig, "01_training_curves.png")
 
 
 def barh(ax, rows, unit, title, xmax=None):
-    """xmax: shared scale when panels in one figure have the same unit, so equal values get equal bars."""
-    labels = [r[0] for r in rows][::-1]
-    vals = [r[1] for r in rows][::-1]
-    cols = [BLUE if r[2] else QUIET for r in rows][::-1]
+    """rows: (label, value, highlighted[, ci95]). xmax: shared scale when panels in one figure have the same unit."""
+    rows = rows[::-1]
+    labels, vals = [r[0] for r in rows], [r[1] for r in rows]
+    cols = [BLUE if r[2] else QUIET for r in rows]
     xmax = xmax or max(vals)
     ax.barh(labels, vals, color=cols, height=.5)
-    for i, v in enumerate(vals):
-        ax.text(v + xmax * .012, i, f"{v:.2f} {unit}", va="center", fontweight="bold")
+    for i, r in enumerate(rows):
+        nd = 3 if len(r) > 3 and r[3] < .005 else 2   # enough decimals that the interval does not round to zero
+        ci = f" ± {r[3]:.{nd}f}" if len(r) > 3 else ""
+        ax.text(r[1] + xmax * .012, i, f"{r[1]:.{nd}f}{ci} {unit}", va="center", fontweight="bold")
     ax.spines[["top", "right", "bottom"]].set_visible(False)
     ax.set_xticks([])
     ax.tick_params(axis="y", length=0)
-    ax.set_xlim(0, xmax * 1.2)
+    ax.set_xlim(0, xmax * 1.25)
     ax.set_title(title)
 
 
-def later_runs():
-    """(label, test results) for each run after the first, newest last; files appear once eval_long.py has run on them."""
-    out = []
-    for name, csv_name in (("eval_long.json", "long_disp_val.csv"), ("eval_max.json", "max_disp_val.csv")):
-        if os.path.exists(os.path.join(HERE, name)):
-            with open(os.path.join(HERE, "runs", csv_name)) as f:
-                steps = list(csv.DictReader(f))[-1]["step"]
-            out.append((f"{int(steps):,} steps", json.load(open(os.path.join(HERE, name)))))
-    return out
-
-
-t = E["test"]
-dp, sp, ev, pre = t["disp_px"], t["strain_pct"], E["eval_bug"], E["preprocessing"]
-LATER = later_runs()
-FIRST = f"{json.load(open(os.path.join(HERE, 'runs', 'disp_timing.json')))['steps']} steps"
-d_runs = [(f"DisplacementNet, {lab}", r["disp_px"]["mean"]) for lab, r in LATER[::-1]]
-s_runs = [(f"StrainNet, {lab}", r["strain_pct"]["mean"]) for lab, r in LATER[::-1]]
-n = len(LATER)
-fig, axes = plt.subplots(2, 1, figsize=(10, 5.4 + .55 * n), layout="constrained")
-barh(axes[0], [("Farneback optical flow (classical)", dp["farneback"]["mean"], 0)] + [(l, v, i == 0) for i, (l, v) in enumerate(d_runs)] +
-              [(f"DisplacementNet, first run ({FIRST})", dp["net_p2"]["mean"], n == 0),
-               ("First run, notebook settings only", dp["net_p1"]["mean"], 0), ("Predicting zero everywhere", dp["zero"]["mean"], 0)],
-     "px", "Displacement error on 300 unseen pairs")
-barh(axes[1], [("Differentiated Farneback flow", sp["from_farneback"]["mean"], 0)] + [(l, v, i == 0) for i, (l, v) in enumerate(s_runs)] +
-              [("StrainNet, first run", sp["strainnet_p2"]["mean"], n == 0),
-               ("Predicting zero everywhere", sp["zero"]["mean"], 0), ("Differentiated DisplacementNet, first run", sp["from_dispnet"]["mean"], 0)],
-     "%", "Strain error on 300 unseen pairs")
+# Test-set results on 500 unseen pairs (eval_test500.py); the bug measurements below stay on evaluate.py's samples
+T5 = json.load(open(os.path.join(HERE, "test500.json")))
+dp, sp, ev, pre = T5["disp_px"], T5["strain_pct"], E["eval_bug"], E["preprocessing"]
+steps = lambda f: f"{int(list(csv.DictReader(open(os.path.join(HERE, 'runs', f))))[-1]['step']):,} steps"
+first = {t: f"{json.load(open(os.path.join(HERE, 'runs', f'{t}_timing.json')))['steps']} steps" for t in ("disp", "strain")}
+row = lambda label, d, hi=0: (label, d["mean"], hi, d["ci95"])
+fig, axes = plt.subplots(2, 1, figsize=(10, 6.2), layout="constrained")
+barh(axes[0], [row("Farneback optical flow (classical)", dp["farneback"]), row(f"DisplacementNet, {steps('long_disp_val.csv')}", dp["long"], 1),
+               row(f"DisplacementNet, first run ({first['disp']})", dp["net_p2"]), row("First run, notebook settings only", dp["net_p1"]),
+               row("Predicting zero everywhere", dp["zero"])], "px", f"Displacement error on {T5['samples']} unseen pairs, with 95% intervals")
+barh(axes[1], [row("Differentiated Farneback flow", sp["from_farneback"]), row(f"StrainNet, {steps('long_strain_val.csv')}", sp["long"], 1),
+               row(f"StrainNet, first run ({first['strain']})", sp["strainnet_p2"]), row("Best constant for each channel", sp["best_constant"]),
+               row("Predicting zero everywhere", sp["zero"]), row(f"Differentiated DisplacementNet, {steps('long_disp_val.csv')}", sp["from_long_dispnet"])],
+     "%", f"Strain error on {T5['samples']} unseen pairs, with 95% intervals")
 save(fig, "02_test_results.png")
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 4.4), layout="constrained")

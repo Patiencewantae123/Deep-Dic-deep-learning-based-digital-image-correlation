@@ -1,0 +1,11 @@
+[strain] step 2637 phase 1 7s val mse 4.6172 mae 1.6479
+[strain] step 2640 phase 1 21s val mse 52.5273 mae 5.1619
+[strain] step 2760 phase 1 288s val mse 6.4555 mae 2.1314
+[strain] step 2880 phase 1 558s val mse 31.6334 mae 4.2001
+[strain] step 3000 phase 1 866s val mse 18.3044 mae 3.3074
+[strain] step 3120 phase 1 1172s val mse 5.1169 mae 1.7863
+[strain] step 3240 phase 1 1428s val mse 5.1651 mae 1.8381
+[strain] step 3360 phase 1 1721s val mse 6.9620 mae 2.2165
+[strain] step 3480 phase 1 1993s val mse 4.6667 mae 1.6799
+[strain] step 3600 phase 1 2228s val mse 4.7143 mae 1.6795
+[strain] step 3720 phase 1 2470s val mse 20.5680 mae 3.4749
