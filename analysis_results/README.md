@@ -160,6 +160,7 @@ limit. StrainNet's weights are not included, because neither run gives usable st
 | `07_strain_overfit_test.png` | StrainNet loss on 12 fixed images |
 | `08_roi_tracking.png` | ROI position and edge error over 40 frames, committed against fixed notebook |
 | `09_long_training.png` | Validation error over both training runs, against the paper's final value |
+| `10_inputs_outputs.png` | What the run notebooks take in and every field they save, on the 40-frame tensile test, against the truth |
 
 ## Reproducing the results
 
@@ -179,6 +180,7 @@ python roi_test.py runs/long_disp_phase2.pth ../metrics/roi_test.json roi_before
 python pipeline_test.py flow ../metrics/pipeline_test_flow.json
 python pipeline_test.py net ../metrics/pipeline_test_net.json runs/long_disp_phase2.pth runs/long_strain_phase2.pth
 python strain_probe.py ../metrics/strain_probe.json
+python io_figure.py roi_work/pipeline_net ../figures/10_inputs_outputs.png
 python verify_fixed.py ../..
 ```
 

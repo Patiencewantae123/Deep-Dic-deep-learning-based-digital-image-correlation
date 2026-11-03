@@ -55,34 +55,57 @@ for ax, task, scale, unit, title in ((axes[0], "disp", .5, "px", "DisplacementNe
 save(fig, "01_training_curves.png")
 
 
-def barh(ax, rows, unit, title):
+def barh(ax, rows, unit, title, xmax=None):
+    """xmax: shared scale when panels in one figure have the same unit, so equal values get equal bars."""
     labels = [r[0] for r in rows][::-1]
     vals = [r[1] for r in rows][::-1]
     cols = [BLUE if r[2] else QUIET for r in rows][::-1]
+    xmax = xmax or max(vals)
     ax.barh(labels, vals, color=cols, height=.5)
     for i, v in enumerate(vals):
-        ax.text(v + max(vals) * .012, i, f"{v:.2f} {unit}", va="center", fontweight="bold")
+        ax.text(v + xmax * .012, i, f"{v:.2f} {unit}", va="center", fontweight="bold")
     ax.spines[["top", "right", "bottom"]].set_visible(False)
     ax.set_xticks([])
     ax.tick_params(axis="y", length=0)
-    ax.set_xlim(0, max(vals) * 1.2)
+    ax.set_xlim(0, xmax * 1.2)
     ax.set_title(title)
+
+
+def later_runs():
+    """(label, test results) for each run after the first, newest last; files appear once eval_long.py has run on them."""
+    out = []
+    for name, csv_name in (("eval_long.json", "long_disp_val.csv"), ("eval_max.json", "max_disp_val.csv")):
+        if os.path.exists(os.path.join(HERE, name)):
+            with open(os.path.join(HERE, "runs", csv_name)) as f:
+                steps = list(csv.DictReader(f))[-1]["step"]
+            out.append((f"{int(steps):,} steps", json.load(open(os.path.join(HERE, name)))))
+    return out
 
 
 t = E["test"]
 dp, sp, ev, pre = t["disp_px"], t["strain_pct"], E["eval_bug"], E["preprocessing"]
-fig, axes = plt.subplots(2, 1, figsize=(10, 5.4), layout="constrained")
-barh(axes[0], [("Farneback optical flow (classical)", dp["farneback"]["mean"], 0), ("DisplacementNet with learning-rate drop", dp["net_p2"]["mean"], 1),
-               ("DisplacementNet, notebook settings only", dp["net_p1"]["mean"], 0), ("Predicting zero everywhere", dp["zero"]["mean"], 0)], "px", "Displacement error on 300 unseen pairs")
-barh(axes[1], [("Differentiated Farneback flow", sp["from_farneback"]["mean"], 0), ("StrainNet", sp["strainnet_p2"]["mean"], 1),
-               ("Predicting zero everywhere", sp["zero"]["mean"], 0), ("Differentiated DisplacementNet", sp["from_dispnet"]["mean"], 0)], "%", "Strain error on 300 unseen pairs")
+LATER = later_runs()
+FIRST = f"{json.load(open(os.path.join(HERE, 'runs', 'disp_timing.json')))['steps']} steps"
+d_runs = [(f"DisplacementNet, {lab}", r["disp_px"]["mean"]) for lab, r in LATER[::-1]]
+s_runs = [(f"StrainNet, {lab}", r["strain_pct"]["mean"]) for lab, r in LATER[::-1]]
+n = len(LATER)
+fig, axes = plt.subplots(2, 1, figsize=(10, 5.4 + .55 * n), layout="constrained")
+barh(axes[0], [("Farneback optical flow (classical)", dp["farneback"]["mean"], 0)] + [(l, v, i == 0) for i, (l, v) in enumerate(d_runs)] +
+              [(f"DisplacementNet, first run ({FIRST})", dp["net_p2"]["mean"], n == 0),
+               ("First run, notebook settings only", dp["net_p1"]["mean"], 0), ("Predicting zero everywhere", dp["zero"]["mean"], 0)],
+     "px", "Displacement error on 300 unseen pairs")
+barh(axes[1], [("Differentiated Farneback flow", sp["from_farneback"]["mean"], 0)] + [(l, v, i == 0) for i, (l, v) in enumerate(s_runs)] +
+              [("StrainNet, first run", sp["strainnet_p2"]["mean"], n == 0),
+               ("Predicting zero everywhere", sp["zero"]["mean"], 0), ("Differentiated DisplacementNet, first run", sp["from_dispnet"]["mean"], 0)],
+     "%", "Strain error on 300 unseen pairs")
 save(fig, "02_test_results.png")
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 4.4), layout="constrained")
+top = max(ev["eval"], ev["train_mode"], ev["polluted_eval"], pre["dim_second_norm_each"], pre["dim_second_norm_first"], pre["dim_second_raw"])
 barh(axes[0], [("Fixed: fcn.eval() called", ev["eval"], 1), ("Committed: eval() never called", ev["train_mode"], 0),
-               ("Eval after 150 frames in train mode", ev["polluted_eval"], 0)], "px", "Inference without fcn.eval(): displacement error")
+               ("Eval after 150 frames in train mode", ev["polluted_eval"], 0)], "px", "Inference without fcn.eval(): displacement error", top)
 barh(axes[1], [("Fixed: each image over its own maximum", pre["dim_second_norm_each"], 1), ("Committed StrainNet_run: image 2 over image 1's maximum", pre["dim_second_norm_first"], 0),
-               ("Training's preprocessing: no normalisation", pre["dim_second_raw"], 0)], "px", "Light dims 20% between two frames: displacement error")
+               ("Training's preprocessing: no normalisation", pre["dim_second_raw"], 0)], "px", "Light dims 20% between two frames: displacement error", top)
 save(fig, "03_silent_bugs.png")
 
 
@@ -119,8 +142,8 @@ save(panels("hard"), "05_displacement_hard_sample.png")
 d = np.load(os.path.join(HERE, "fields", "typical.npz"))
 st, ps, fd = d["st"][1], d["ps"][1], d["fromdisp"][1]
 S = float(np.ceil(np.abs(st).max()))
-fig, ax = plt.subplots(1, 3, figsize=(10.5, 5), layout="constrained")
-for x, f, t_ in zip(ax, (st, ps, fd), ("True ∂u/∂x", "StrainNet", "Differentiated DisplacementNet")):
+fig, ax = plt.subplots(1, 3, figsize=(10.5, 4.3), layout="constrained")
+for x, f, t_ in zip(ax, (st, ps, fd), ("True ∂u/∂column (εxx)", "StrainNet", "Differentiated DisplacementNet")):
     m = x.imshow(f, cmap=DIV, vmin=-S, vmax=S)
     x.set_title(t_, fontsize=10.5, fontweight="normal")
     x.set_xticks([])

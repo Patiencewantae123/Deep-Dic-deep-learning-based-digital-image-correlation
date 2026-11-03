@@ -1,0 +1,40 @@
+[strain] step 2637 phase 1 13s val mse 4.6172 mae 1.6479
+[strain] step 2640 phase 1 41s val mse 52.5212 mae 5.1616
+[strain] step 2760 phase 1 544s val mse 6.4197 mae 2.1251
+[strain] step 2880 phase 1 1072s val mse 31.6174 mae 4.1990
+[strain] step 3000 phase 1 1625s val mse 18.4543 mae 3.3176
+Traceback (most recent call last):
+  File "C:\Users\chosun\AppData\Local\Temp\claude\c--Users-chosun-Downloads-mty-my-New-folder-New-folder-Deep-Dic-deep-learning-based-digital-image-correlation\949b9c08-f384-4750-9021-d677033c2f8c\scratchpad\train_long.py", line 110, in <module>
+  File "C:\Users\chosun\AppData\Local\Temp\claude\c--Users-chosun-Downloads-mty-my-New-folder-New-folder-Deep-Dic-deep-learning-based-digital-image-correlation\949b9c08-f384-4750-9021-d677033c2f8c\scratchpad\train_long.py", line 91, in run_phase
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\modules\module.py", line 1787, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\modules\module.py", line 1798, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "<string>", line 108, in forward
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\modules\module.py", line 1787, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\modules\module.py", line 1798, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\modules\batchnorm.py", line 210, in forward
+    return F.batch_norm(
+           ~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<11 lines>...
+        self.eps,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\chosun\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\torch\nn\functional.py", line 2904, in batch_norm
+    return torch.batch_norm(
+           ~~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<7 lines>...
+        torch.backends.cudnn.enabled,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: [enforce fail at alloc_cpu.cpp:117] data. DefaultCPUAllocator: not enough memory: you tried to allocate 12582912 bytes.
