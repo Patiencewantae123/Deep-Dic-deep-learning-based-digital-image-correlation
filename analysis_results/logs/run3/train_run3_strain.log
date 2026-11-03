@@ -9,3 +9,10 @@
 [strain] step 3480 phase 1 1993s val mse 4.6667 mae 1.6799
 [strain] step 3600 phase 1 2228s val mse 4.7143 mae 1.6795
 [strain] step 3720 phase 1 2470s val mse 20.5680 mae 3.4749
+[strain] step 3840 phase 1 2771s val mse 5.2544 mae 1.8737
+[strain] step 3960 phase 1 3070s val mse 5.2578 mae 1.8823
+[strain] step 4080 phase 1 3377s val mse 4.7241 mae 1.6873
+[strain] step 4200 phase 1 3674s val mse 12.2405 mae 2.8459
+[strain] step 4320 phase 1 3969s val mse 5.4636 mae 1.9219
+[strain] step 4440 phase 1 4273s val mse 4.6449 mae 1.6407
+[strain] step 4560 phase 1 4579s val mse 7.6677 mae 2.3304
